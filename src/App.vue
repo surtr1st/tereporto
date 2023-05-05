@@ -42,7 +42,7 @@ import TitleHeader from './components/TitleHeader.vue';
     <GridItem position="aside">
       <StoragePanel>
         <List>
-          <ListItem>
+          <ListItem v-for="i in 15">
             <Idol />
             <Descriptive
               title="Storage folder X"

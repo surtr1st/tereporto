@@ -13,7 +13,7 @@ li {
   align-items: center;
   background: var(--light-neutral-gray);
   border-radius: 10px;
-  margin: 0.3rem;
+  margin-bottom: 0.8rem;
   transition: all 150ms;
 }
 

@@ -23,17 +23,6 @@
   margin: 0;
   background: var(--darker-neutral-gray);
   box-sizing: border-box;
+  scroll-behavior: smooth;
 }
 
-::-webkit-scrollbar {
-  width: 5px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: var(--light-neutral-gray);
-  border-radius: 2rem;
-}
-
-::-webkit-scrollbar-track {
-  width: 5px;
-}
