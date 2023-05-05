@@ -48,8 +48,10 @@ if (rounded) className.value += ' tp__button--rounded';
 
 <style scoped>
 button {
-  width: 122px;
-  height: 51px;
+  min-width: 38px;
+  max-width: 122px;
+  min-height: 38px;
+  max-height: 51px;
   border: none;
   margin: 0.1rem;
 }
