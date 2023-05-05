@@ -13,7 +13,7 @@ const className = ref('');
 if (color === 'darker') className.value += 'tp__button--darker ';
 if (color === 'neutral') className.value += 'tp__button--neutral ';
 if (color === 'danger') className.value += 'tp__button--danger ';
-if (rounded) className.value = 'tp__button--rounded';
+if (rounded) className.value += ' tp__button--rounded';
 </script>
 
 <template>
@@ -51,6 +51,7 @@ button {
   width: 122px;
   height: 51px;
   border: none;
+  margin: 0.1rem;
 }
 button:hover {
   cursor: pointer;
@@ -67,7 +68,7 @@ button:hover {
   background: var(--light-neutral-gray);
 }
 .tp__button--neutral {
-  background: var(--neutral-color);
+  background: var(--neutral-gray);
   color: white;
 }
 .tp__button--neutral:hover {

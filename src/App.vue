@@ -4,20 +4,21 @@ import ButtonGroup from './components/ButtonGroup.vue';
 </script>
 
 <template>
-  <ButtonGroup>
-    <Button
-      label="New Teleport"
-      color="darker"
-    />
-    <Button
-      label="New Storage"
-      color="darker"
-    />
-    <Button
-      label="Scan Teleport"
-      color="darker"
-    />
-  </ButtonGroup>
+  <Button
+    label="New Teleport"
+    color="darker"
+    rounded
+  />
+  <Button
+    label="New Storage"
+    color="danger"
+    rounded
+  />
+  <Button
+    label="Scan Teleport"
+    color="neutral"
+    rounded
+  />
 </template>
 
 <style scoped></style>
