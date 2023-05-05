@@ -6,14 +6,16 @@ interface IButton {
   label?: string;
   color?: 'neutral' | 'darker' | 'danger';
   rounded?: boolean;
+  larger?: boolean;
   onClick?: () => void | Promise<void>;
 }
-const { rounded, color } = defineProps<IButton>();
-const className = ref('');
-if (color === 'darker') className.value += 'tp__button--darker ';
-if (color === 'neutral') className.value += 'tp__button--neutral ';
-if (color === 'danger') className.value += 'tp__button--danger ';
+const { larger, rounded, color } = defineProps<IButton>();
+const className = ref('tp__button');
+if (color === 'darker') className.value += ' tp__button--darker';
+if (color === 'neutral') className.value += ' tp__button--neutral';
+if (color === 'danger') className.value += ' tp__button--danger';
 if (rounded) className.value += ' tp__button--rounded';
+if (larger) className.value += ' tp__button--larger';
 </script>
 
 <template>
@@ -47,15 +49,18 @@ if (rounded) className.value += ' tp__button--rounded';
 </template>
 
 <style scoped>
-button {
+.tp__button {
   min-width: 38px;
-  max-width: 122px;
   min-height: 38px;
-  max-height: 51px;
   border: none;
   margin: 0.1rem;
+  padding: 0.5rem;
 }
-button:hover {
+.tp__button--larger {
+  width: 122px;
+  height: 51px;
+}
+.tp__button:hover {
   cursor: pointer;
   transition: all 250ms;
 }

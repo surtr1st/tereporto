@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Button from './components/Button.vue';
+import ButtonGroup from './components/ButtonGroup.vue';
 import Descriptive from './components/Descriptive.vue';
 import Flex from './components/Flex.vue';
 import FunctionalPanel from './components/FunctionalPanel.vue';
@@ -56,7 +57,32 @@ import TitleHeader from './components/TitleHeader.vue';
       </StoragePanel>
     </GridItem>
     <GridItem position="footer">
-      <FunctionalPanel></FunctionalPanel>
+      <FunctionalPanel>
+        <Button
+          label="New Teleport"
+          color="darker"
+          rounded
+          larger
+        />
+        <Button
+          label="New Storage"
+          color="darker"
+          rounded
+          larger
+        />
+        <ButtonGroup>
+          <Button
+            label="Scan Teleport"
+            color="darker"
+            larger
+          />
+          <Button
+            label="Scan a specific dir"
+            color="darker"
+            larger
+          />
+        </ButtonGroup>
+      </FunctionalPanel>
     </GridItem>
   </Grid>
 </template>
