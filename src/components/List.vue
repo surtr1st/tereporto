@@ -10,5 +10,6 @@ ul {
   justify-content: center;
   flex-direction: column;
   align-items: center;
+  background: var(--neutral-gray);
 }
 </style>
