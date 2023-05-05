@@ -21,8 +21,8 @@ defineProps<ICheckbox>();
 .tp__checkbox-label {
   display: block;
   position: relative;
-  padding-top: 3.5px;
-  padding-left: 35px;
+  padding-top: 1px;
+  padding-left: 30px;
   cursor: pointer;
   font-size: 15px;
   font-weight: 500;
@@ -47,9 +47,9 @@ defineProps<ICheckbox>();
   position: absolute;
   top: 0;
   left: 0;
-  height: 30px;
-  width: 30px;
-  border-radius: 10px;
+  height: 24px;
+  width: 24px;
+  border-radius: 50%;
   background: var(--darker-neutral);
   transition: all 150ms;
 }
@@ -78,8 +78,8 @@ defineProps<ICheckbox>();
 
 /* Style the checkmark/indicator */
 .tp__checkbox-label .tp__checkmark:after {
-  left: 11px;
-  top: 7px;
+  left: 8px;
+  top: 4.2px;
   width: 5px;
   height: 10px;
   border: solid white;
