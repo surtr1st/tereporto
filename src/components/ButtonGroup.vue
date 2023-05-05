@@ -8,9 +8,10 @@
 
 <style>
 .tp__button-group {
-  gap: 0.1rem;
+  gap: 5px;
   width: auto;
   float: left;
+  background: inherit;
 }
 .tp__button-group::after {
   content: '';
