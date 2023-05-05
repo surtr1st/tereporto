@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Button from './components/Button.vue';
 import ButtonGroup from './components/ButtonGroup.vue';
+import Checkbox from './components/Checkbox.vue';
 import Descriptive from './components/Descriptive.vue';
 import FunctionalPanel from './components/FunctionalPanel.vue';
 import Grid from './components/Grid.vue';
@@ -57,6 +58,8 @@ import TitleHeader from './components/TitleHeader.vue';
     </GridItem>
     <GridItem position="footer">
       <FunctionalPanel>
+        <Checkbox label="Start along side with OS" />
+        <Checkbox label="Auto-scan" />
         <Button
           label="New Teleport"
           color="darker"
@@ -76,7 +79,7 @@ import TitleHeader from './components/TitleHeader.vue';
             larger
           />
           <Button
-            label="Scan a specific dir"
+            label="Choose"
             color="darker"
             larger
           />
