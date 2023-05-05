@@ -22,3 +22,16 @@
   margin: 0;
   box-sizing: border-box;
 }
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--light-neutral-gray);
+  border-radius: 2rem;
+}
+
+::-webkit-scrollbar-track {
+  width: 5px;
+}
