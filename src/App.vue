@@ -47,7 +47,9 @@ import TitleHeader from './components/TitleHeader.vue';
             <Descriptive
               title="Storage folder X"
               description="usr/bede/123"
-            />
+            >
+              <Checkbox label="Primary" />
+            </Descriptive>
             <Button
               rounded
               color="danger"

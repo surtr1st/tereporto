@@ -51,6 +51,7 @@ defineProps<ICheckbox>();
   width: 30px;
   border-radius: 10px;
   background: var(--darker-neutral);
+  transition: all 150ms;
 }
 
 /* On mouse-over, add a grey background color */
