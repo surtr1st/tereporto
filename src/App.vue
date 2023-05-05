@@ -2,7 +2,6 @@
 import Button from './components/Button.vue';
 import ButtonGroup from './components/ButtonGroup.vue';
 import Descriptive from './components/Descriptive.vue';
-import Flex from './components/Flex.vue';
 import FunctionalPanel from './components/FunctionalPanel.vue';
 import Grid from './components/Grid.vue';
 import GridItem from './components/GridItem.vue';

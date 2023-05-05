@@ -10,6 +10,9 @@ defineProps<IDescriptive>();
   <span class="tp__descriptive">
     <h3>{{ title }}</h3>
     <p>"{{ description }}"</p>
+    <div class="tp__descriptive-item">
+      <slot />
+    </div>
   </span>
 </template>
 
