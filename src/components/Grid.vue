@@ -12,6 +12,5 @@
     'lside footer footer footer footer rside';
   gap: 10px;
   padding: 10px;
-  place-items: center;
 }
 </style>

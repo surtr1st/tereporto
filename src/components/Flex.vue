@@ -1,13 +1,23 @@
 <script setup lang="ts">
+import { StyleValue } from 'vue';
+
 interface IFlex {
-  justifyContent?: 'space-around' | 'space-between' | 'space-evenly' | 'center';
-  alignItems?: 'center';
+  justifyContent?:
+    | 'space-around'
+    | 'space-between'
+    | 'space-evenly'
+    | 'center'
+    | 'flex-end'
+    | 'flex-start';
+  alignItems?: 'center' | 'flex-start' | 'flex-end';
   gap?: number;
+  column?: boolean;
 }
-const { justifyContent, alignItems, gap } = defineProps<IFlex>();
-const flexStyle = {
-  'justify-content': justifyContent,
-  'align-items': alignItems,
+const { justifyContent, alignItems, gap, column } = defineProps<IFlex>();
+const flexStyle: StyleValue = {
+  'justify-content': justifyContent ?? 'center',
+  'align-items': alignItems ?? 'center',
+  'flex-direction': column ? 'column' : 'row',
   gap: `${gap}px`,
 };
 </script>
@@ -15,7 +25,7 @@ const flexStyle = {
 <template>
   <div
     class="tp__flex"
-    :style="flexStyle"
+    :style="{ ...flexStyle }"
   >
     <slot />
   </div>

@@ -3,6 +3,7 @@ import Button from './components/Button.vue';
 import ButtonGroup from './components/ButtonGroup.vue';
 import Checkbox from './components/Checkbox.vue';
 import Descriptive from './components/Descriptive.vue';
+import Flex from './components/Flex.vue';
 import FunctionalPanel from './components/FunctionalPanel.vue';
 import Grid from './components/Grid.vue';
 import GridItem from './components/GridItem.vue';
@@ -17,76 +18,98 @@ import TitleHeader from './components/TitleHeader.vue';
 <template>
   <Grid>
     <GridItem position="lheader">
-      <TitleHeader title="Teleported Folders" />
+      <Flex
+        justify-content="center"
+        align-items="center"
+      >
+        <TitleHeader
+          title="Teleported Folders"
+          text-position="center"
+        />
+      </Flex>
     </GridItem>
     <GridItem position="rheader">
-      <TitleHeader title="Storage Folders" />
+      <Flex
+        justify-content="center"
+        align-items="center"
+      >
+        <TitleHeader
+          title="Storage Folders"
+          text-position="center"
+        />
+      </Flex>
     </GridItem>
     <GridItem position="main">
-      <TeleportPanel>
-        <List>
-          <ListItem>
-            <Idol />
-            <Descriptive
-              title="Storage folder X"
-              description="usr/bede/123"
-            />
-            <Button
-              rounded
-              color="danger"
-            />
-          </ListItem>
-        </List>
-      </TeleportPanel>
+      <Flex justify-content="flex-end">
+        <TeleportPanel>
+          <List>
+            <ListItem>
+              <Idol />
+              <Descriptive
+                title="Storage folder X"
+                description="usr/bede/123"
+              />
+              <Button
+                rounded
+                color="danger"
+              />
+            </ListItem>
+          </List>
+        </TeleportPanel>
+      </Flex>
     </GridItem>
     <GridItem position="aside">
-      <StoragePanel>
-        <List>
-          <ListItem v-for="i in 15">
-            <Idol />
-            <Descriptive
-              title="Storage folder X"
-              description="usr/bede/123"
-            >
-              <Checkbox label="Primary" />
-            </Descriptive>
-            <Button
-              rounded
-              color="danger"
-            />
-          </ListItem>
-        </List>
-      </StoragePanel>
+      <Flex justify-content="flex-start">
+        <StoragePanel>
+          <List>
+            <ListItem v-for="i in 15">
+              <Idol />
+              <Descriptive
+                title="Storage folder X"
+                description="usr/bede/123"
+              >
+                <Checkbox label="Primary" />
+              </Descriptive>
+              <Button
+                rounded
+                color="danger"
+              />
+            </ListItem>
+          </List>
+        </StoragePanel>
+      </Flex>
     </GridItem>
     <GridItem position="footer">
-      <FunctionalPanel>
-        <Checkbox label="Start along side with OS" />
-        <Checkbox label="Auto-scan" />
-        <Button
-          label="New Teleport"
-          color="darker"
-          rounded
-          larger
-        />
-        <Button
-          label="New Storage"
-          color="darker"
-          rounded
-          larger
-        />
-        <ButtonGroup>
+      <Flex justify-content="center">
+        <FunctionalPanel>
+          <Checkbox label="Start along side with OS" />
+          <Checkbox label="Auto-scan" />
           <Button
-            label="Scan Teleport"
+            label="New Teleport"
             color="darker"
+            rounded
             larger
           />
           <Button
-            label="Choose"
+            label="New Storage"
             color="darker"
+            rounded
             larger
           />
-        </ButtonGroup>
-      </FunctionalPanel>
+          <ButtonGroup>
+            <Button
+              label="Scan Teleport"
+              color="darker"
+              larger
+            />
+            <Button
+              label="Choose"
+              color="darker"
+              larger
+            />
+          </ButtonGroup>
+        </FunctionalPanel>
+      </Flex>
     </GridItem>
   </Grid>
 </template>
