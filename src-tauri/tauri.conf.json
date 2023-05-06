@@ -18,6 +18,10 @@
         "open": true
       }
     },
+      "systemTray": {
+        "iconPath": "icons/icon.ico",
+        "iconAsTemplate": true
+      },
     "bundle": {
       "active": true,
       "icon": [
