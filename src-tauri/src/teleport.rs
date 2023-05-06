@@ -1,33 +1,26 @@
-#[derive(Debug, Default, serde::Serialize)]
-pub struct Teleport {
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct Teleport<'t> {
+    pub index: &'t str,
     pub name: String,
-    pub directories: Vec<String>
+    pub directories: Vec<String>,
+    pub to: &'t str
 }
 
 #[derive(Debug, Default, serde::Serialize)]
-pub struct TeleportBox {
-    pub teleports: Teleport
+pub struct TeleportBox<'tb> {
+    pub teleports: Teleport<'tb>
 }
 
-impl Teleport {
+impl <'t> Teleport<'t> {
     pub fn create(self) -> String {
-        let directories = self.directories
-            .clone()
-            .into_iter()
-            .map(toml::Value::String)
-            .collect::<Vec<_>>();
-        let inline_table = {
-            let mut table = toml::value::Table::new();
-            table.insert("name".to_string(), toml::Value::String(self.name.clone()));
-            table.insert("directories".to_string(), toml::Value::Array(directories));
-            table
+        let teleport = TeleportBox {
+            teleports: Teleport { 
+                index: self.index,
+                name: self.name, 
+                directories: self.directories,
+                to: self.to
+            }
         };
-
-        // Create a top-level table and insert the inline table
-        let mut table = toml::Table::new();
-        table.insert("teleports".to_string(), toml::value::Value::Table(inline_table));
-
-        // Serialize the top-level table to TOML
-        toml::to_string(&table).expect("Failed to serialize TOML")
+        toml::to_string_pretty(&teleport).unwrap()
     }
 }

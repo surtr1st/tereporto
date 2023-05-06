@@ -1,12 +1,21 @@
-use bcrypt::{hash, verify};
+use hex;
+use sha2::{Digest, Sha256};
 
 pub struct HashHandler;
 
 impl HashHandler {
     pub fn encrypt(target: &str) -> String {
-        hash(target, 7).unwrap()
+        let hash = Sha256::new()
+            .chain_update(target.as_bytes())
+            .finalize();
+        hex::encode(hash)
     }
-    pub fn is_match(original: &str, target: &str) -> bool {
-        verify(original, target).unwrap()
+
+    pub fn compare(target: &str, original: &str) -> bool {
+        let from_hashed = hex::decode(target).unwrap();
+        let from_original = Sha256::new()
+            .chain_update(original)
+            .finalize();
+        from_original.as_slice() == from_hashed
     }
 }

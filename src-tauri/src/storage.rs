@@ -1,29 +1,28 @@
-
-use toml_edit::Document;
-
-#[derive(Debug, Default, serde::Serialize)]
-pub struct Storage {
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct Storage<'s> {
+    pub index: &'s str,
     pub name: String,
-    pub directories: Vec<StorageDirectory>
-}
-
-#[derive(Debug, Default, serde::Serialize)]
-pub struct StorageDirectory {
-    pub dir: String,
+    pub directory: String,
+    pub bind: &'s str,
     pub primary: bool
 }
 
 #[derive(Debug, Default, serde::Serialize)]
-pub struct StorageBox {
-    pub storage: Storage
+pub struct StorageBox<'sb> {
+    pub storage: Storage<'sb>
 }
 
-impl Storage {
+impl <'s> Storage<'s> {
     pub fn create(self) -> String {
-        let template = format!(r#"
-            storage = {{ name = {}, directories = {:?} }}
-        "#, self.name, self.directories);
-        let doc = template.parse::<Document>().expect("invalid document");
-        doc.to_string()
+        let storage = StorageBox {
+            storage: Storage {
+                index: self.index,
+                name: self.name,
+                directory: self.directory,
+                bind: self.bind,
+                primary: self.primary
+            }
+        };
+        toml::to_string_pretty(&storage).unwrap()
     }
 }
