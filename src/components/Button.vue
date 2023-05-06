@@ -55,6 +55,8 @@ if (larger) className.value += ' tp__button--larger';
   border: none;
   margin: 0.1rem;
   padding: 0.5rem;
+  transition: all 250ms;
+  font-weight: 500;
 }
 .tp__button--larger {
   width: 122px;
@@ -62,7 +64,6 @@ if (larger) className.value += ' tp__button--larger';
 }
 .tp__button:hover {
   cursor: pointer;
-  transition: all 250ms;
 }
 .tp__button--rounded {
   border-radius: 10px;
