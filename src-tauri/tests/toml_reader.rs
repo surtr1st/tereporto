@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod toml_reader_tests {
-    use tereporto::toml_handler::TOMLHandler;
+    use tereporto::{toml_handler::TOMLHandler, storage, teleport, hash_handler::HashHandler};
     use std::{env, fs::File, path::Path};
     const BASE_DIR: &str = "HOME";
     const FOLDER: &str = ".tereporto";
@@ -40,5 +40,37 @@ mod toml_reader_tests {
         let storage = link["storage"]["name"].as_str().unwrap();
         assert_eq!(teleports, "adudarkwa");
         assert_eq!(storage, "123456");
+    }
+
+
+    // #[test]
+    // fn create_key() {
+    //     let handler = TOMLHandler::new();
+    //     let key = HashHandler::encrypt("Test");
+    //     let toml_key = toml::to_string_pretty(&key).unwrap();
+    //     handler.create_unique_key(key.clone());
+    //     assert_eq!(key, toml_key);
+    // }
+
+    #[test]
+    fn write_toml_content() {
+        let handler = TOMLHandler::new();
+        let store = storage::Storage {
+            name: "Storage Folder".to_string(),
+            directories: vec![
+                storage::StorageDirectory {
+                    dir: "/x/y/z".to_string(),
+                    primary: true
+                } 
+            ]
+        };
+        let tele = teleport::Teleport {
+            name: "Teleport Folder".to_string(),
+            directories: vec!["/a/b/c".to_string()]
+        };
+
+        let key = HashHandler::encrypt("Test");
+        // handler.clone().compose(tele.create());
+        handler.clone().compose(store.create());
     }
 }
