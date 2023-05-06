@@ -1,4 +1,5 @@
 use std::{env, fs, path::Path};
+use log;
 
 const BASE_FILENAME: &str = "links.toml";
 
@@ -64,20 +65,25 @@ impl TOMLHandler {
         // Read the TOML file
         let file = format!("{}/{}", self.directory, self.filename);
         let mut data = fs::read_to_string(&file).unwrap();
+        log::info!("TOML={}", &data);
 
         // Parse the TOML into a Value
         let mut content: toml::Value = toml::from_str(&data)
             .expect("Failed to parse TOML");
+        log::info!("CONTENT={}", &content);
 
         // Update the array by specifying its key
         if let Some(table) = content.get_mut(&key).and_then(|value| value.as_table_mut()) {
+            log::info!("KEY={}", &table);
             if let Some(dirs) = table.get_mut(&field).and_then(|value| value.as_array_mut()) {
+                log::info!("FIELD={:?}", &dirs);
                 dirs.push(toml::Value::String(value));
             }
         }
 
         // Serialize the updated TOML back to a string
         data = toml::to_string_pretty(&content).unwrap();
+        log::info!("FINALIZE={}", &data);
 
         // Write the updated TOML back to the file
         self.compose(data);

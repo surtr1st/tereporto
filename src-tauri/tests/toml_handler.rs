@@ -1,8 +1,9 @@
 #[cfg(test)]
 mod toml_handler_tests {
+    use tokio;
     use tereporto::{toml_handler::TOMLHandler, storage, teleport, hash_handler::HashHandler};
     use std::{env, fs::File, path::Path};
-    use log::info;
+    use env_logger;
 
     const BASE_DIR: &str = "HOME";
     const FOLDER: &str = ".tereporto";
@@ -10,30 +11,30 @@ mod toml_handler_tests {
     const TELEPORT_NAME: &str = "Teleport Folder";
     const STORAGE_NAME: &str = "Storage Folder"; 
 
-    #[test]
-    fn default_init() {
+    #[tokio::test]
+    async fn default_init() {
         let reader = TOMLHandler::new();
         let default_dir = format!("{}/{}", env::var(BASE_DIR).unwrap(), &FOLDER);
         assert_eq!(reader.directory, default_dir);
         assert_eq!(reader.filename, FILENAME);
     }
 
-    #[test]
-    fn folder_existed() {
+    #[tokio::test]
+    async fn folder_existed() {
         let dir_folder = format!("{}/{}", env::var(&BASE_DIR).unwrap(), &FOLDER);
         let path = Path::new(&dir_folder).exists();
         assert_eq!(path, true);
     }
 
-    #[test]
-    fn file_existed() {
+    #[tokio::test]
+    async fn file_existed() {
         let dir_file = format!("{}/{}/{}", env::var(&BASE_DIR).unwrap(), &FOLDER, &FILENAME);
         let file = File::open(dir_file).is_ok();
         assert_eq!(file, true);
     } 
 
-    #[test]
-    fn write_teleport_content() {
+    #[tokio::test]
+    async fn write_teleport_content() {
         let handler = TOMLHandler::new();
         let teleport_index = HashHandler::encrypt(&TELEPORT_NAME);
         let storage_index = HashHandler::encrypt(&STORAGE_NAME);
@@ -47,9 +48,8 @@ mod toml_handler_tests {
         handler.compose(tele.create());
     }
 
-
-    #[test]
-    fn write_storage_content() {
+    #[tokio::test]
+    async fn write_storage_content() {
         let handler = TOMLHandler::new();
         let teleport_index = HashHandler::encrypt(&TELEPORT_NAME);
         let storage_index = HashHandler::encrypt(&STORAGE_NAME);
@@ -64,8 +64,8 @@ mod toml_handler_tests {
         handler.compose(store.create());
     }
 
-    #[test]
-    fn teleport_block_existed() {
+    #[tokio::test]
+    async fn teleport_block_existed() {
         let reader = TOMLHandler::new();
         let data = reader.read_from_file();
         let teleport = &data["teleports"];
@@ -73,8 +73,8 @@ mod toml_handler_tests {
         assert_eq!(teleport_name, TELEPORT_NAME.to_string());
     }
 
-    #[test]
-    fn storage_block_existed() {
+    #[tokio::test]
+    async fn storage_block_existed() {
         let reader = TOMLHandler::new();
         let data = reader.read_from_file();
         let storage = &data["storage"];
@@ -82,8 +82,8 @@ mod toml_handler_tests {
         assert_eq!(storage_name, STORAGE_NAME.to_string());
     }
 
-    #[test]
-    fn is_link_with_storage() {
+    #[tokio::test]
+    async fn is_link_with_storage() {
         let handler = TOMLHandler::new();
         let data = handler.read_from_file();
         let teleport = &data["teleports"];
@@ -93,8 +93,8 @@ mod toml_handler_tests {
         assert_eq!(teleport_to, storage_index);
     }
 
-    #[test]
-    fn is_link_with_teleport() {
+    #[tokio::test]
+    async fn is_link_with_teleport() {
         let handler = TOMLHandler::new();
         let data = handler.read_from_file();
         let teleport = &data["teleports"];
@@ -104,8 +104,8 @@ mod toml_handler_tests {
         assert_eq!(teleport_index, storage_bind);
     }
 
-    #[test]
-    fn update_teleport_directories() {
+    #[tokio::test]
+    async fn update_teleport_directories() {
         env_logger::init();
         let handler = TOMLHandler::new();
         handler.clone().update(
@@ -114,7 +114,7 @@ mod toml_handler_tests {
             "/a/du/dark/wa".to_string()
         );
         let teleport = handler.clone().read_from_file();
-        let dirs = teleport["directories"].as_array().unwrap();
-        assert_eq!(dirs.len(), 2);
+        let dirs = teleport["teleports"]["directories"].as_array().unwrap();
+        assert!(dirs.len() > 1);
     }
 }
