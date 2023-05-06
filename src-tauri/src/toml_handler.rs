@@ -1,16 +1,15 @@
 use std::fs::{create_dir, metadata, File};
 use std::{env, fs};
-use toml::Value;
 
 const BASE_FILENAME: &str = "links.toml";
 
 #[derive(Debug, Default)]
-pub struct TOMLReader {
+pub struct TOMLHandler {
     pub directory: String,
     pub filename: String,
 }
 
-impl TOMLReader {
+impl TOMLHandler {
     pub fn new() -> Self {
         let root = env::var("HOME").unwrap();
         let store_folder = ".tereporto";
@@ -24,15 +23,20 @@ impl TOMLReader {
         if !file_existed {
             File::create(&default_file).unwrap();
         }
-        TOMLReader {
+        TOMLHandler {
             directory: default_path,
             filename: BASE_FILENAME.to_string(),
         }
     }
 
-    pub fn read_from_file(self) -> Value {
+    pub fn read_from_file(self) -> toml::Value {
         let file = format!("{}/{}", self.directory, self.filename);
         let content = fs::read_to_string(file).unwrap();
-        content.parse::<Value>().unwrap()
+        content.parse::<toml::Value>().unwrap()
+    }
+
+    pub fn compose(self, data: String) {
+        let file = format!("{}/{}", self.directory, self.filename);
+        fs::write(file, data).expect("failed to write file");
     }
 }

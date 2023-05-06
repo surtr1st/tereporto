@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod toml_reader_tests {
-    use tereporto::toml_handler::TOMLReader;
+    use tereporto::toml_handler::TOMLHandler;
     use std::{env, fs::File, path::Path};
     const BASE_DIR: &str = "HOME";
     const FOLDER: &str = ".tereporto";
@@ -8,7 +8,7 @@ mod toml_reader_tests {
 
     #[test]
     fn default_init() {
-        let reader: TOMLReader = TOMLReader::new();
+        let reader = TOMLHandler::new();
         let default_dir = format!("{}/{}", env::var(BASE_DIR).unwrap(), &FOLDER);
         assert_eq!(reader.directory, default_dir);
         assert_eq!(reader.filename, FILENAME);
@@ -30,7 +30,7 @@ mod toml_reader_tests {
 
     #[test]
     fn read_file_content() {
-        let reader: TOMLReader = TOMLReader::new();
+        let reader = TOMLHandler::new();
         let data = reader.read_from_file();
         // [<hash>]
         let link = &data["Twitter"];
