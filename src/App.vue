@@ -117,5 +117,9 @@ const open = ref<boolean>(false);
       </Flex>
     </GridItem>
   </Grid>
-  <Modal :open="open" />
+  <Modal
+    :open="open"
+    title="Test"
+    @close="open = false"
+  />
 </template>
