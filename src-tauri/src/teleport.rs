@@ -1,17 +1,17 @@
 #[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
-pub struct Teleport<'t> {
-    pub index: &'t str,
+pub struct Teleport {
+    pub index: String,
     pub name: String,
     pub directories: Vec<String>,
-    pub to: &'t str,
+    pub to: String
 }
 
 #[derive(Debug, Default, serde::Serialize)]
-pub struct TeleportBox<'tb> {
-    pub teleports: Teleport<'tb>,
+pub struct TeleportBox {
+    pub teleports: Teleport
 }
 
-impl<'t> Teleport<'t> {
+impl Teleport {
     pub fn serialize(self) -> String {
         let teleport = TeleportBox {
             teleports: Teleport {

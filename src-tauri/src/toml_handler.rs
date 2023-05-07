@@ -19,11 +19,11 @@ pub struct TOMLUpdateArgs<'tua> {
 }
 
 impl TOMLHandler {
-    pub fn new(filename: String) -> Self {
+    pub fn new(filename: &str) -> Self {
         let root = env::var("HOME").unwrap();
         let store_folder = ".tereporto";
         let default_path = format!("{}/{}", root, store_folder);
-        let default_file = format!("{}/{}", default_path, &filename);
+        let default_file = format!("{}/{}", default_path, filename);
 
         // Create directory if it doesn't exist
         if !Path::new(&default_path).is_dir() {
@@ -37,8 +37,12 @@ impl TOMLHandler {
 
         TOMLHandler {
             directory: default_path,
-            filename,
+            filename: filename.to_string(),
         }
+    }
+
+    pub fn change_default_directory(&mut self, dir: &str) {
+        self.directory = dir.to_string();
     }
 
     pub fn read_from_file(self) -> toml::Value {
@@ -50,12 +54,12 @@ impl TOMLHandler {
             .expect("should be parsed TOML string into toml::Value")
     }
 
-    pub fn compose(self, target: String) {
+    pub fn compose(self, target: &str) {
         let file = format!("{}/{}", self.directory, self.filename);
 
         // Read the TOML file
         let current_content =
-            fs::read_to_string(&file).expect(&format!("should have read file: {}", self.filename));
+            fs::read_to_string(&file).unwrap_or_else(|_| panic!("should have read file: {}", self.filename));
 
         // Parse the TOML string into a `toml::Value`
         let mut table = current_content
@@ -82,7 +86,7 @@ impl TOMLHandler {
 
         // Read the TOML file
         let mut data =
-            fs::read_to_string(file).expect(&format!("should have read file: {}", self.filename));
+            fs::read_to_string(file).unwrap_or_else(|_| panic!("should have read file: {}", self.filename));
 
         // Parse the TOML into a `toml::Value`
         let mut content: toml::Value =
@@ -106,6 +110,6 @@ impl TOMLHandler {
             toml::to_string_pretty(&content).expect("should be serialized the data back to string");
 
         // Write the updated TOML back to the file
-        self.compose(data);
+        self.compose(&data);
     }
 }

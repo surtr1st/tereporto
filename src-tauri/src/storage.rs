@@ -1,26 +1,24 @@
 #[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
-pub struct Storage<'s> {
-    pub index: &'s str,
+pub struct Storage {
+    pub index: String,
     pub name: String,
     pub directory: String,
-    pub bind: &'s str,
-    pub primary: bool,
+    pub constraint: String
 }
 
 #[derive(Debug, Default, serde::Serialize)]
-pub struct StorageBox<'sb> {
-    pub storage: Storage<'sb>,
+pub struct StorageBox {
+    pub storage: Storage
 }
 
-impl<'s> Storage<'s> {
+impl Storage {
     pub fn serialize(self) -> String {
         let storage = StorageBox {
             storage: Storage {
                 index: self.index,
                 name: self.name,
                 directory: self.directory,
-                bind: self.bind,
-                primary: self.primary,
+                constraint: self.constraint
             },
         };
         toml::to_string_pretty(&storage).unwrap()
