@@ -1,25 +1,20 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-pub mod toml_handler;
 pub mod hash_handler;
 pub mod storage;
 pub mod teleport;
+pub mod toml_handler;
 
 use tauri::{
-    AppHandle, CustomMenuItem, Manager, RunEvent, SystemTray, SystemTrayEvent, SystemTrayMenu,
-    SystemTrayMenuItem, WindowEvent,
+    AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, RunEvent, SystemTray, SystemTrayEvent,
+    SystemTrayMenu, SystemTrayMenuItem, WindowEvent,
 };
 
 fn main() {
     tauri::Builder::default()
         .system_tray(create_system_tray())
         .on_system_tray_event(handle_system_tray)
-        .on_window_event(|event| {
-            if let WindowEvent::CloseRequested { api, .. } = event.event() {
-                event.window().hide().unwrap();
-                api.prevent_close();
-            }
-        })
+        .on_window_event(prevent_frontend_on_close)
         .invoke_handler(tauri::generate_handler![])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
@@ -49,6 +44,13 @@ fn handle_system_tray(app: &AppHandle, event: SystemTrayEvent) {
             }
             _ => {}
         }
+    }
+}
+
+fn prevent_frontend_on_close(event: GlobalWindowEvent) {
+    if let WindowEvent::CloseRequested { api, .. } = event.event() {
+        event.window().hide().unwrap();
+        api.prevent_close();
     }
 }
 
