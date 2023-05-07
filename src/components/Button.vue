@@ -6,14 +6,17 @@ interface IButton {
   label?: string;
   color?: 'neutral' | 'darker' | 'danger';
   rounded?: boolean;
+  larger?: boolean;
   onClick?: () => void | Promise<void>;
 }
-const { rounded, color } = defineProps<IButton>();
-const className = ref('');
-if (color === 'darker') className.value += 'tp__button--darker ';
-if (color === 'neutral') className.value += 'tp__button--neutral ';
-if (color === 'danger') className.value += 'tp__button--danger ';
-if (rounded) className.value = 'tp__button--rounded';
+const { larger, rounded, color } = defineProps<IButton>();
+
+const className = ref<string>('tp__button');
+if (color === 'darker') className.value += ' tp__button--darker';
+if (color === 'neutral') className.value += ' tp__button--neutral';
+if (color === 'danger') className.value += ' tp__button--danger';
+if (rounded) className.value += ' tp__button--rounded';
+if (larger) className.value += ' tp__button--larger';
 </script>
 
 <template>
@@ -47,14 +50,21 @@ if (rounded) className.value = 'tp__button--rounded';
 </template>
 
 <style scoped>
-button {
+.tp__button {
+  min-width: 38px;
+  min-height: 38px;
+  border: none;
+  margin: 0.1rem;
+  padding: 0.5rem;
+  transition: all 250ms;
+  font-weight: 500;
+}
+.tp__button--larger {
   width: 122px;
   height: 51px;
-  border: none;
 }
-button:hover {
+.tp__button:hover {
   cursor: pointer;
-  transition: all 250ms;
 }
 .tp__button--rounded {
   border-radius: 10px;
@@ -67,7 +77,7 @@ button:hover {
   background: var(--light-neutral-gray);
 }
 .tp__button--neutral {
-  background: var(--neutral-color);
+  background: var(--neutral-gray);
   color: white;
 }
 .tp__button--neutral:hover {
