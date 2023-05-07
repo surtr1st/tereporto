@@ -10,9 +10,12 @@ import GridItem from './components/GridItem.vue';
 import Idol from './components/Idol.vue';
 import List from './components/List.vue';
 import ListItem from './components/ListItem.vue';
+import Modal from './components/Modal.vue';
 import StoragePanel from './components/StoragePanel.vue';
 import TeleportPanel from './components/TeleportPanel.vue';
 import TitleHeader from './components/TitleHeader.vue';
+import { ref } from 'vue';
+const open = ref<boolean>(false);
 </script>
 
 <template>
@@ -62,14 +65,15 @@ import TitleHeader from './components/TitleHeader.vue';
       <Flex justify-content="flex-start">
         <StoragePanel>
           <List>
-            <ListItem v-for="i in 15">
+            <ListItem
+              v-for="i in 15"
+              :id="i"
+            >
               <Idol />
               <Descriptive
                 title="Storage folder X"
                 description="usr/bede/123"
-              >
-                <Checkbox label="Primary" />
-              </Descriptive>
+              />
               <Button
                 rounded
                 color="danger"
@@ -106,12 +110,12 @@ import TitleHeader from './components/TitleHeader.vue';
               label="Choose"
               color="darker"
               larger
+              @click="open = true"
             />
           </ButtonGroup>
         </FunctionalPanel>
       </Flex>
     </GridItem>
   </Grid>
+  <Modal :open="open" />
 </template>
-
-<style scoped></style>

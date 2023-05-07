@@ -2,6 +2,7 @@
 interface IDescriptive {
   title?: string;
   description?: string;
+  onAction?: () => void | Promise<void>;
 }
 defineProps<IDescriptive>();
 </script>
@@ -9,7 +10,12 @@ defineProps<IDescriptive>();
 <template>
   <span class="tp__descriptive">
     <h3>{{ title }}</h3>
-    <p>"{{ description }}"</p>
+    <p
+      class="tp__link"
+      @click="onAction"
+    >
+      "{{ description }}"
+    </p>
     <slot />
   </span>
 </template>
@@ -29,5 +35,15 @@ defineProps<IDescriptive>();
   color: #7b7b7b;
   font-size: 13px;
   background: inherit;
+}
+.tp__link {
+  background: inherit;
+  border-radius: 5px;
+  padding: 0.1rem;
+}
+.tp__link:hover {
+  background: var(--neutral-gray);
+  transition: ease-in 150ms;
+  transition-delay: 100ms;
 }
 </style>

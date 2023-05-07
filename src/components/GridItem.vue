@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+
 enum GridPosition {
   HEADER = 'header',
   LEFT_HEADER = 'lheader',
@@ -12,7 +13,8 @@ interface IGridItem {
   position?: 'header' | 'lheader' | 'rheader' | 'main' | 'aside' | 'footer';
 }
 const { position } = defineProps<IGridItem>();
-const className = ref('');
+
+const className = ref<string>('');
 switch (position) {
   case GridPosition.HEADER:
     className.value = 'tp__grid-header';

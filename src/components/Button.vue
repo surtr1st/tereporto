@@ -10,7 +10,8 @@ interface IButton {
   onClick?: () => void | Promise<void>;
 }
 const { larger, rounded, color } = defineProps<IButton>();
-const className = ref('tp__button');
+
+const className = ref<string>('tp__button');
 if (color === 'darker') className.value += ' tp__button--darker';
 if (color === 'neutral') className.value += ' tp__button--neutral';
 if (color === 'danger') className.value += ' tp__button--danger';

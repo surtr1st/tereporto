@@ -13,7 +13,8 @@ interface ITitleHeader {
   textPosition?: 'left' | 'right' | 'center' | 'top' | 'bottom';
 }
 const { textPosition } = defineProps<ITitleHeader>();
-const className = ref('tp__title-header');
+
+const className = ref<string>('tp__title-header');
 switch (textPosition) {
   case TitleHeaderPosition.CENTER:
     className.value += ' tp__title-header--center';
