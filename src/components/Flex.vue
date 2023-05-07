@@ -14,6 +14,7 @@ interface IFlex {
   column?: boolean;
 }
 const { justifyContent, alignItems, gap, column } = defineProps<IFlex>();
+
 const flexStyle: StyleValue = {
   'justify-content': justifyContent ?? 'center',
   'align-items': alignItems ?? 'center',

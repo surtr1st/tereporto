@@ -1,5 +1,6 @@
 <script setup lang="ts">
 interface ICheckbox {
+  name?: string;
   label?: string;
   checked?: boolean;
 }
@@ -7,11 +8,15 @@ defineProps<ICheckbox>();
 </script>
 
 <template>
-  <label class="tp__checkbox-label">
+  <label
+    :for="name"
+    class="tp__checkbox-label"
+  >
     {{ label }}
     <input
       type="checkbox"
       :checked="checked"
+      :name="name"
     />
     <span class="tp__checkmark"></span>
   </label>
