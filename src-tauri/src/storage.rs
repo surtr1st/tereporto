@@ -17,8 +17,8 @@ pub struct StorageBox {
 #[derive(Args, serde::Serialize, serde::Deserialize)]
 pub struct StorageArgs {
     pub name: String,
-    pub directories: Vec<String>,
-    pub to: Option<String>
+    pub directory: String,
+    pub constraint: Option<String>
 }
 
 #[derive(Debug, Clone)]
