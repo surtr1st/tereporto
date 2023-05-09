@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
 
 interface IModal {
   name?: string;
+  title?: string;
   open?: boolean;
+  nested?: boolean;
   onClose?: () => void | Promise<void>;
 }
 const { open, onClose } = defineProps<IModal>();
-
-const modal = ref<HTMLDivElement | null>();
-const closeButton = ref<HTMLSpanElement | null>();
 
 function closeOnEscape(e: KeyboardEvent) {
   const ESC = 'Escape';
@@ -18,20 +17,11 @@ function closeOnEscape(e: KeyboardEvent) {
     onClose!();
   }
 }
-function display() {
-  if (modal.value) modal.value.style.display = 'block';
-}
-function close() {
-  if (modal.value) modal.value.style.display = 'none';
-}
 
 onMounted(() => {
-  if (open) display();
-  closeButton.value?.addEventListener('click', close);
   window.addEventListener('keydown', closeOnEscape);
 });
 onUnmounted(() => {
-  closeButton.value?.removeEventListener('click', close);
   window.removeEventListener('keydown', closeOnEscape);
 });
 </script>
@@ -41,27 +31,20 @@ onUnmounted(() => {
     <Transition name="fade">
       <div
         :id="name"
-        ref="modal"
-        class="tp__modal"
+        :class="nested ? 'tp__nested-modal' : 'tp__modal'"
         v-if="open"
       >
         <div class="tp__modal-content">
           <div class="tp__modal-header">
+            <h2>{{ title }}</h2>
             <span
-              ref="close"
+              @click="onClose"
               class="tp__modal--close"
             >
               &times;
             </span>
-            <h2>Modal Header</h2>
           </div>
-          <div class="tp__modal-body">
-            <p>Some text in the Modal Body</p>
-            <p>Some other text...</p>
-          </div>
-          <div class="tp__modal-footer">
-            <h3>Modal Footer</h3>
-          </div>
+          <slot />
         </div>
       </div>
     </Transition>
@@ -69,6 +52,41 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.tp__modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: var(--dark-bg);
+  border-radius: 0.7rem;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.2rem;
+  box-shadow: 1px 2px black;
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+.tp__nested-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: var(--dark-bg);
+  border-radius: 0.7rem;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.2rem;
+  box-shadow: 1px 2px black;
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
 .fade-enter-active {
   animation: fade-in 100ms;
   animation-fill-mode: forwards;
@@ -79,63 +97,61 @@ onUnmounted(() => {
   animation-fill-mode: forwards;
   animation-timing-function: ease-out;
 }
-.tp__modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0, 0, 0); /* Fallback color */
-  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-}
 
-/* Modal Content */
 .tp__modal-content {
   position: relative;
-  background-color: #fefefe;
   margin: auto;
-  padding: 0;
-  border: 1px solid #888;
-  width: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.6rem;
+  width: 40%;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  -webkit-animation-name: animatetop;
-  -webkit-animation-duration: 0.4s;
-  animation-name: animatetop;
-  animation-duration: 0.4s;
+  border-radius: 10px;
 }
 
-/* The Close Button */
 .tp__modal--close {
   color: white;
   float: right;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: bold;
 }
 
 .tp__modal--close:hover,
 .tp__modal--close:focus {
-  color: #000;
   text-decoration: none;
   cursor: pointer;
 }
 
 .tp__modal-header {
-  padding: 2px 16px;
-  background-color: #5cb85c;
-  color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.7rem;
+  border-radius: 10px;
+}
+.tp__modal-header > h2 {
+  color: #fefefe;
 }
 
 .tp__modal-body {
-  padding: 2px 16px;
+  padding: 1rem;
+  display: grid;
+  height: 50vh;
+  max-height: 70vh;
+  place-items: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 10px;
+  padding: 0.2rem;
 }
 
 .tp__modal-footer {
-  padding: 2px 16px;
-  background-color: #5cb85c;
-  color: white;
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  align-items: center;
+  padding: 0.2rem;
+  margin-bottom: 0.5rem;
+  border-radius: 10px;
 }
 </style>
