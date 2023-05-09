@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod toml_handler_on_action {
     use std::{thread, time::Duration};
-    use tereporto::{hash_handler::HashHandler, storage::{self, Storage}, teleport::{self, Teleport}, toml_handler::TOMLHandler, base::get_base_directory};
+    use tereporto::{hash_handler::HashHandler, storage::{self, Storage}, teleport::{self, Teleport}, toml_handler::TOMLHandler, base::{Base, DirectoryControl}};
 
     const FILENAME: &str = "links.toml";
     const TELEPORT_NAME: &str = "Teleport Folder";
@@ -10,7 +10,7 @@ mod toml_handler_on_action {
     #[test]
     fn create_toml_file() {
         thread::sleep(Duration::from_millis(500));
-        let dir = &get_base_directory();
+        let dir = Base::init_path().get_base_directory();
         let mut handler = TOMLHandler::default();
         handler.create_file(&dir, FILENAME);
     }
@@ -27,7 +27,8 @@ mod toml_handler_on_action {
             to: Some(storage_index),
         };
 
-        let file = format!("{}/{}", &get_base_directory(), FILENAME);
+        let dir = Base::init_path().get_base_directory();
+        let file = format!("{}/{}", &dir, FILENAME);
         handler
             .retrieve(&file)
             .compose(&Teleport::serialize(teleport)).unwrap();
@@ -45,7 +46,8 @@ mod toml_handler_on_action {
             constraint: Some(teleport_index) 
         };
 
-        let file = format!("{}/{}", &get_base_directory(), FILENAME);
+        let dir = Base::init_path().get_base_directory();
+        let file = format!("{}/{}", &dir, FILENAME);
         handler
             .retrieve(&file)
             .compose(&Storage::serialize(store)).unwrap();
@@ -55,7 +57,7 @@ mod toml_handler_on_action {
 #[cfg(test)]
 mod toml_handler_on_validation {
     use std::{env, fs::File, path::Path, thread, time::Duration};
-    use tereporto::{toml_handler::TOMLHandler, base::get_base_directory};
+    use tereporto::{toml_handler::TOMLHandler, base::{Base, DirectoryControl}};
 
     const BASE_DIR: &str = "HOME";
     const FOLDER: &str = ".tereporto";
@@ -74,7 +76,8 @@ mod toml_handler_on_validation {
     #[test]
     fn file_existed() {
         thread::sleep(Duration::from_millis(500));
-        let dir_file = format!("{}/{}", &get_base_directory(), FILENAME);
+        let dir = Base::init_path().get_base_directory();
+        let dir_file = format!("{}/{}", &dir, FILENAME);
         let file = File::open(dir_file).is_ok();
         assert_eq!(file, true);
     }
@@ -83,7 +86,8 @@ mod toml_handler_on_validation {
     fn teleport_block_existed() {
         thread::sleep(Duration::from_millis(500));
         let mut handler = TOMLHandler::default();
-        let file = format!("{}/{}", &get_base_directory(), FILENAME);
+        let dir = Base::init_path().get_base_directory();
+        let file = format!("{}/{}", &dir, FILENAME);
         let data = handler
             .retrieve(&file)
             .read_content();
@@ -97,7 +101,8 @@ mod toml_handler_on_validation {
     fn storage_block_existed() {
         thread::sleep(Duration::from_millis(500));
         let mut handler = TOMLHandler::default();
-        let file = format!("{}/{}", &get_base_directory(), FILENAME);
+        let dir = Base::init_path().get_base_directory();
+        let file = format!("{}/{}", &dir, FILENAME);
         let data = handler
             .retrieve(&file)
             .read_content();
@@ -111,7 +116,8 @@ mod toml_handler_on_validation {
     fn constrainted_with_storage() {
         thread::sleep(Duration::from_millis(500));
         let mut handler = TOMLHandler::default();
-        let file = format!("{}/{}", &get_base_directory(), FILENAME);
+        let dir = Base::init_path().get_base_directory();
+        let file = format!("{}/{}", &dir, FILENAME);
         let data = handler
             .retrieve(&file)
             .read_content();
@@ -127,7 +133,8 @@ mod toml_handler_on_validation {
     fn constrainted_with_teleport() {
         thread::sleep(Duration::from_millis(500));
         let mut handler = TOMLHandler::default();
-        let file = format!("{}/{}", &get_base_directory(), FILENAME);
+        let dir = Base::init_path().get_base_directory();
+        let file = format!("{}/{}", &dir, FILENAME);
         let data = handler
             .retrieve(&file)
             .read_content();
@@ -143,7 +150,7 @@ mod toml_handler_on_validation {
 #[cfg(test)]
 mod toml_handler_on_modification {
     use std::{thread, time::Duration};
-    use tereporto::{toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs}, base::get_base_directory};
+    use tereporto::{toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs}, base::{Base, DirectoryControl}};
 
     const FILENAME: &str = "links.toml";
 
@@ -152,7 +159,8 @@ mod toml_handler_on_modification {
         thread::sleep(Duration::from_secs(1));
         env_logger::init();
         let mut handler = TOMLHandler::default();
-        let file = format!("{}/{}", &get_base_directory(), FILENAME);
+        let dir = Base::init_path().get_base_directory();
+        let file = format!("{}/{}", &dir, FILENAME);
         let mut data = handler
             .retrieve(&file)
             .read_content();

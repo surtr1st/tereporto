@@ -1,4 +1,5 @@
-use crate::base::get_base_directory;
+use crate::base::{DirectoryControl, Base};
+use crate::hash_handler::HashHandler;
 use crate::teleport::{TeleportArgs, Teleport, NewTeleport};
 use crate::toml_handler::{TOMLHandler, TOMLUpdateArgs, MappedField};
 
@@ -6,10 +7,15 @@ use crate::toml_handler::{TOMLHandler, TOMLUpdateArgs, MappedField};
 #[tauri::command]
 pub fn create_teleport(t: TeleportArgs) -> Result<String, String> {
     let mut handler = TOMLHandler::default();
-    let dir = &get_base_directory();
+
+    let base = Base::init_path();
+    Base::create_folder(&t.directories[0], &t.name);
+
+    // Hashing and take this at filename
+    let hasher = HashHandler::encrypt(&t.name);
 
     handler
-        .create_file(dir, &t.name)
+        .create_file(&base.get_base_directory(), &hasher)
         .compose(&Teleport::serialize(NewTeleport {
             name: &t.name,
             directories: &t.directories,
@@ -20,7 +26,8 @@ pub fn create_teleport(t: TeleportArgs) -> Result<String, String> {
 #[tauri::command]
 pub fn update_teleport(filename: String, target: MappedField) -> Result<String, String> {
     let mut handler = TOMLHandler::default();
-    let file = format!("{}/{}", &get_base_directory(), &filename);
+    let dir = Base::init_path().get_base_directory();
+    let file = format!("{}/{}", &dir, &filename);
 
     let mut content = handler
         .retrieve(&file)
