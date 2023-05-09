@@ -45,7 +45,7 @@ impl TOMLHandler {
         self.directory = dir.to_string();
     }
 
-    pub fn read_from_file(self) -> toml::Value {
+    pub fn read_from_file(&mut self) -> toml::Value {
         let file = format!("{}/{}", self.directory, self.filename);
         let content = fs::read_to_string(file).unwrap();
         // Parse the TOML string into `toml::Value`
@@ -54,17 +54,9 @@ impl TOMLHandler {
             .expect("should be parsed TOML string into toml::Value")
     }
 
-    pub fn compose(self, target: &str) {
+    pub fn compose(&mut self, target: &str) {
         let file = format!("{}/{}", self.directory, self.filename);
-
-        // Read the TOML file
-        let current_content =
-            fs::read_to_string(&file).unwrap_or_else(|_| panic!("should have read file: {}", self.filename));
-
-        // Parse the TOML string into a `toml::Value`
-        let mut table = current_content
-            .parse::<toml::Value>()
-            .expect("should be parsed TOML string into toml::Value");
+        let mut table = self.read_from_file();
 
         // Modify the parsed TOML value by adding or updating the desired fields
         let additional_content = target.parse::<toml::Value>().unwrap();
@@ -81,16 +73,8 @@ impl TOMLHandler {
         fs::write(file, updated_content).unwrap();
     }
 
-    pub fn update(self, target: TOMLUpdateArgs) {
-        let file = format!("{}/{}", self.directory, self.filename);
-
-        // Read the TOML file
-        let mut data =
-            fs::read_to_string(file).unwrap_or_else(|_| panic!("should have read file: {}", self.filename));
-
-        // Parse the TOML into a `toml::Value`
-        let mut content: toml::Value =
-            toml::from_str(&data).expect("should be parsed TOML string into toml::Value");
+    pub fn update(&mut self, target: TOMLUpdateArgs) {
+        let mut content = self.read_from_file(); 
 
         // Update the array by specifying its key
         if let Some(table) = content
@@ -106,7 +90,7 @@ impl TOMLHandler {
         }
 
         // Serialize the updated TOML back to a string
-        data =
+        let data =
             toml::to_string_pretty(&content).expect("should be serialized the data back to string");
 
         // Write the updated TOML back to the file

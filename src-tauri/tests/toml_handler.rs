@@ -9,7 +9,7 @@ mod toml_handler_on_action {
     #[test]
     fn write_teleport_content() {
         thread::sleep(Duration::from_millis(500));
-        let handler = TOMLHandler::new(FILENAME);
+        let mut handler = TOMLHandler::new(FILENAME);
         let teleport_index = HashHandler::encrypt(&TELEPORT_NAME);
         let storage_index = HashHandler::encrypt(&STORAGE_NAME);
         let teleport = teleport::Teleport {
@@ -25,7 +25,7 @@ mod toml_handler_on_action {
     #[test]
     fn write_storage_content() {
         thread::sleep(Duration::from_millis(500));
-        let handler = TOMLHandler::new(FILENAME);
+        let mut handler = TOMLHandler::new(FILENAME);
         let teleport_index = HashHandler::encrypt(&TELEPORT_NAME);
         let storage_index = HashHandler::encrypt(&STORAGE_NAME);
         let store = storage::Storage {
@@ -77,7 +77,7 @@ mod toml_handler_on_validation {
     #[test]
     fn teleport_block_existed() {
         thread::sleep(Duration::from_millis(500));
-        let reader = TOMLHandler::new(FILENAME);
+        let mut reader = TOMLHandler::new(FILENAME);
         let data = reader.read_from_file();
         let teleport = &data["teleports"];
         let teleport_name = teleport["name"].as_str().unwrap();
@@ -87,7 +87,7 @@ mod toml_handler_on_validation {
     #[test]
     fn storage_block_existed() {
         thread::sleep(Duration::from_millis(500));
-        let reader = TOMLHandler::new(FILENAME);
+        let mut reader = TOMLHandler::new(FILENAME);
         let data = reader.read_from_file();
         let storage = &data["storage"];
         let storage_name = storage["name"].as_str().unwrap();
@@ -97,7 +97,7 @@ mod toml_handler_on_validation {
     #[test]
     fn constrainted_with_storage() {
         thread::sleep(Duration::from_millis(500));
-        let handler = TOMLHandler::new(FILENAME);
+        let mut handler = TOMLHandler::new(FILENAME);
         let data = handler.read_from_file();
         let teleport = &data["teleports"];
         let storage = &data["storage"];
@@ -109,7 +109,7 @@ mod toml_handler_on_validation {
     #[test]
     fn constrainted_with_teleport() {
         thread::sleep(Duration::from_millis(500));
-        let handler = TOMLHandler::new(FILENAME);
+        let mut handler = TOMLHandler::new(FILENAME);
         let data = handler.read_from_file();
         let teleport = &data["teleports"];
         let storage = &data["storage"];
