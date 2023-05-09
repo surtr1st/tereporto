@@ -11,6 +11,7 @@ import Idol from './components/Idol.vue';
 import List from './components/List.vue';
 import ListItem from './components/ListItem.vue';
 import Modal from './components/Modal.vue';
+import ModalFooter from './components/ModalFooter.vue';
 import StoragePanel from './components/StoragePanel.vue';
 import TeleportPanel from './components/TeleportPanel.vue';
 import TitleHeader from './components/TitleHeader.vue';
@@ -121,5 +122,14 @@ const open = ref<boolean>(false);
     :open="open"
     title="Test"
     @close="open = false"
-  />
+  >
+    <ModalFooter>
+      <Button
+        label="Test"
+        color="darker"
+        rounded
+        larger
+      />
+    </ModalFooter>
+  </Modal>
 </template>
