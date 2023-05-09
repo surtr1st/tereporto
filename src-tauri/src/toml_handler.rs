@@ -5,7 +5,7 @@ pub struct TOMLHandler {
     pub filename: String,
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MappedField<'mf> {
     pub field: &'mf str,
     pub value: &'mf str,

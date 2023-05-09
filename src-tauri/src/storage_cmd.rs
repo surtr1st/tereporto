@@ -42,4 +42,3 @@ pub fn update_storage(filename: String, target: MappedField) -> Result<String, S
             }
         })
 }
-
