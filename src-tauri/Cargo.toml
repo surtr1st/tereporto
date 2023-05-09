@@ -1,6 +1,6 @@
 [package]
 name = "tereporto"
-version = "0.1.0"
+version = "0.2.0"
 description = "A Tauri App"
 authors = ["you"]
 license = ""
@@ -26,6 +26,7 @@ toml_edit = "0.19.8"
 log = "0.4.17"
 env_logger = "0.10.0"
 tokio = { version = "1.28.0", features = ["full"] }
+clap = { version = "4.2.7", features = ["derive"] }
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

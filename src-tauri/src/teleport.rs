@@ -1,24 +1,41 @@
+use crate::hash_handler::HashHandler;
+use clap::Args;
+
 #[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct Teleport {
     pub index: String,
     pub name: String,
     pub directories: Vec<String>,
-    pub to: String
+    pub to: Option<String>,
 }
 
 #[derive(Debug, Default, serde::Serialize)]
 pub struct TeleportBox {
-    pub teleports: Teleport
+    pub teleports: Teleport,
+}
+
+#[derive(Args, serde::Serialize, serde::Deserialize)]
+pub struct TeleportArgs {
+    pub name: String,
+    pub directories: Vec<String>,
+    pub to: Option<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct NewTeleport<'nt> {
+    pub name: &'nt str,
+    pub directories: &'nt Vec<String>,
+    pub to: Option<String>,
 }
 
 impl Teleport {
-    pub fn serialize(self) -> String {
+    pub fn serialize(t: NewTeleport) -> String {
         let teleport = TeleportBox {
             teleports: Teleport {
-                index: self.index,
-                name: self.name,
-                directories: self.directories,
-                to: self.to,
+                index: HashHandler::encrypt(t.name),
+                name: t.name.to_string(),
+                directories: t.directories.to_vec(),
+                to: t.to,
             },
         };
         toml::to_string_pretty(&teleport).unwrap()
