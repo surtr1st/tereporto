@@ -1,48 +1,61 @@
 #[cfg(test)]
 mod toml_handler_on_action {
     use std::{thread, time::Duration};
-    use tereporto::{hash_handler::HashHandler, storage, teleport, toml_handler::TOMLHandler};
+    use tereporto::{hash_handler::HashHandler, storage::{self, Storage}, teleport::{self, Teleport}, toml_handler::TOMLHandler, base::get_base_directory};
 
     const FILENAME: &str = "links.toml";
     const TELEPORT_NAME: &str = "Teleport Folder";
     const STORAGE_NAME: &str = "Storage Folder";
+
+    #[test]
+    fn create_toml_file() {
+        thread::sleep(Duration::from_millis(500));
+        let dir = &get_base_directory();
+        let mut handler = TOMLHandler::default();
+        handler.create_file(&dir, FILENAME);
+    }
+
     #[test]
     fn write_teleport_content() {
         thread::sleep(Duration::from_millis(500));
-        let mut handler = TOMLHandler::new(FILENAME);
-        let teleport_index = HashHandler::encrypt(&TELEPORT_NAME);
+        let mut handler = TOMLHandler::default();
         let storage_index = HashHandler::encrypt(&STORAGE_NAME);
-        let teleport = teleport::Teleport {
-            index: teleport_index,
-            name: TELEPORT_NAME.to_string(),
-            directories: vec!["/a/b/c".to_string()],
-            to: storage_index,
+
+        let teleport = teleport::NewTeleport {
+            name: TELEPORT_NAME,
+            directories: &vec!["/a/b/c".to_string()],
+            to: Some(storage_index),
         };
 
-        handler.compose(&teleport.serialize());
+        let file = format!("{}/{}", &get_base_directory(), FILENAME);
+        handler
+            .retrieve(&file)
+            .compose(&Teleport::serialize(teleport)).unwrap();
     }
 
     #[test]
     fn write_storage_content() {
         thread::sleep(Duration::from_millis(500));
-        let mut handler = TOMLHandler::new(FILENAME);
+        let mut handler = TOMLHandler::default();
         let teleport_index = HashHandler::encrypt(&TELEPORT_NAME);
-        let storage_index = HashHandler::encrypt(&STORAGE_NAME);
-        let store = storage::Storage {
-            index: storage_index,
-            name: STORAGE_NAME.to_string(),
-            directory: "/x/y/z".to_string(),
-            constraint: teleport_index
+
+        let store = storage::NewStorage {
+            name: STORAGE_NAME,
+            directory: "/x/y/z",
+            constraint: Some(teleport_index) 
         };
 
-        handler.compose(&store.serialize());
+        let file = format!("{}/{}", &get_base_directory(), FILENAME);
+        handler
+            .retrieve(&file)
+            .compose(&Storage::serialize(store)).unwrap();
     }
 }
 
 #[cfg(test)]
 mod toml_handler_on_validation {
     use std::{env, fs::File, path::Path, thread, time::Duration};
-    use tereporto::toml_handler::TOMLHandler;
+    use tereporto::{toml_handler::TOMLHandler, base::get_base_directory};
 
     const BASE_DIR: &str = "HOME";
     const FOLDER: &str = ".tereporto";
@@ -51,17 +64,9 @@ mod toml_handler_on_validation {
     const STORAGE_NAME: &str = "Storage Folder";
 
     #[test]
-    fn default_init() {
-        let reader = TOMLHandler::new(FILENAME);
-        let default_dir = format!("{}/{}", env::var(BASE_DIR).unwrap(), &FOLDER);
-        assert_eq!(reader.directory, default_dir);
-        assert_eq!(reader.filename, FILENAME);
-    }
-
-    #[test]
     fn folder_existed() {
         thread::sleep(Duration::from_millis(500));
-        let dir_folder = format!("{}/{}", env::var(&BASE_DIR).unwrap(), &FOLDER);
+        let dir_folder = format!("{}/{}", env::var(BASE_DIR).unwrap(), FOLDER);
         let path = Path::new(&dir_folder).exists();
         assert_eq!(path, true);
     }
@@ -69,7 +74,7 @@ mod toml_handler_on_validation {
     #[test]
     fn file_existed() {
         thread::sleep(Duration::from_millis(500));
-        let dir_file = format!("{}/{}/{}", env::var(&BASE_DIR).unwrap(), &FOLDER, &FILENAME);
+        let dir_file = format!("{}/{}", &get_base_directory(), FILENAME);
         let file = File::open(dir_file).is_ok();
         assert_eq!(file, true);
     }
@@ -77,8 +82,12 @@ mod toml_handler_on_validation {
     #[test]
     fn teleport_block_existed() {
         thread::sleep(Duration::from_millis(500));
-        let mut reader = TOMLHandler::new(FILENAME);
-        let data = reader.read_from_file();
+        let mut handler = TOMLHandler::default();
+        let file = format!("{}/{}", &get_base_directory(), FILENAME);
+        let data = handler
+            .retrieve(&file)
+            .read_content();
+
         let teleport = &data["teleports"];
         let teleport_name = teleport["name"].as_str().unwrap();
         assert_eq!(teleport_name, TELEPORT_NAME.to_string());
@@ -87,8 +96,12 @@ mod toml_handler_on_validation {
     #[test]
     fn storage_block_existed() {
         thread::sleep(Duration::from_millis(500));
-        let mut reader = TOMLHandler::new(FILENAME);
-        let data = reader.read_from_file();
+        let mut handler = TOMLHandler::default();
+        let file = format!("{}/{}", &get_base_directory(), FILENAME);
+        let data = handler
+            .retrieve(&file)
+            .read_content();
+
         let storage = &data["storage"];
         let storage_name = storage["name"].as_str().unwrap();
         assert_eq!(storage_name, STORAGE_NAME.to_string());
@@ -97,8 +110,12 @@ mod toml_handler_on_validation {
     #[test]
     fn constrainted_with_storage() {
         thread::sleep(Duration::from_millis(500));
-        let mut handler = TOMLHandler::new(FILENAME);
-        let data = handler.read_from_file();
+        let mut handler = TOMLHandler::default();
+        let file = format!("{}/{}", &get_base_directory(), FILENAME);
+        let data = handler
+            .retrieve(&file)
+            .read_content();
+
         let teleport = &data["teleports"];
         let storage = &data["storage"];
         let teleport_to = teleport["to"].as_str().unwrap();
@@ -109,8 +126,12 @@ mod toml_handler_on_validation {
     #[test]
     fn constrainted_with_teleport() {
         thread::sleep(Duration::from_millis(500));
-        let mut handler = TOMLHandler::new(FILENAME);
-        let data = handler.read_from_file();
+        let mut handler = TOMLHandler::default();
+        let file = format!("{}/{}", &get_base_directory(), FILENAME);
+        let data = handler
+            .retrieve(&file)
+            .read_content();
+
         let teleport = &data["teleports"];
         let storage = &data["storage"];
         let teleport_index = teleport["index"].as_str().unwrap();
@@ -122,22 +143,27 @@ mod toml_handler_on_validation {
 #[cfg(test)]
 mod toml_handler_on_modification {
     use std::{thread, time::Duration};
-    use tereporto::toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs};
+    use tereporto::{toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs}, base::get_base_directory};
+
     const FILENAME: &str = "links.toml";
 
     #[test]
     fn update_teleport_directories() {
         thread::sleep(Duration::from_secs(1));
         env_logger::init();
-        let handler = TOMLHandler::new(FILENAME);
-        handler.clone().update(TOMLUpdateArgs {
+        let mut handler = TOMLHandler::default();
+        let file = format!("{}/{}", &get_base_directory(), FILENAME);
+        let mut data = handler
+            .retrieve(&file)
+            .read_content();
+
+        handler.update(&mut data, TOMLUpdateArgs {
             key: "teleports",
             from: MappedField {
                 field: "directories",
                 value: "/a/du/dark/wa/123",
             },
-        });
-        let data = handler.clone().read_from_file();
+        }).unwrap();
         let dirs = data["teleports"]["directories"].as_array().unwrap();
         assert!(dirs.len() > 1);
     }
