@@ -1,7 +1,13 @@
 #[cfg(test)]
 mod toml_handler_on_action {
     use std::{thread, time::Duration};
-    use tereporto::{hash_handler::HashHandler, storage::{self, Storage}, teleport::{self, Teleport}, toml_handler::TOMLHandler, base::{Base, DirectoryControl}};
+    use tereporto::{
+        base::{Base, DirectoryControl},
+        hash_handler::HashHandler,
+        storage::{self, Storage},
+        teleport::{self, Teleport},
+        toml_handler::TOMLHandler,
+    };
 
     const FILENAME: &str = "links.toml";
     const TELEPORT_NAME: &str = "Teleport Folder";
@@ -31,7 +37,8 @@ mod toml_handler_on_action {
         let file = format!("{}/{}", &dir, FILENAME);
         handler
             .retrieve(&file)
-            .compose(&Teleport::serialize(teleport)).unwrap();
+            .compose(&Teleport::serialize(teleport))
+            .unwrap();
     }
 
     #[test]
@@ -43,21 +50,25 @@ mod toml_handler_on_action {
         let store = storage::NewStorage {
             name: STORAGE_NAME,
             directory: "/x/y/z",
-            constraint: Some(teleport_index) 
+            constraint: Some(teleport_index),
         };
 
         let dir = Base::init_path().get_base_directory();
         let file = format!("{}/{}", &dir, FILENAME);
         handler
             .retrieve(&file)
-            .compose(&Storage::serialize(store)).unwrap();
+            .compose(&Storage::serialize(store))
+            .unwrap();
     }
 }
 
 #[cfg(test)]
 mod toml_handler_on_validation {
     use std::{env, fs::File, path::Path, thread, time::Duration};
-    use tereporto::{toml_handler::TOMLHandler, base::{Base, DirectoryControl}};
+    use tereporto::{
+        base::{Base, DirectoryControl},
+        toml_handler::TOMLHandler,
+    };
 
     const BASE_DIR: &str = "HOME";
     const FOLDER: &str = ".tereporto";
@@ -88,9 +99,7 @@ mod toml_handler_on_validation {
         let mut handler = TOMLHandler::default();
         let dir = Base::init_path().get_base_directory();
         let file = format!("{}/{}", &dir, FILENAME);
-        let data = handler
-            .retrieve(&file)
-            .read_content();
+        let data = handler.retrieve(&file).read_content();
 
         let teleport = &data["teleports"];
         let teleport_name = teleport["name"].as_str().unwrap();
@@ -103,9 +112,7 @@ mod toml_handler_on_validation {
         let mut handler = TOMLHandler::default();
         let dir = Base::init_path().get_base_directory();
         let file = format!("{}/{}", &dir, FILENAME);
-        let data = handler
-            .retrieve(&file)
-            .read_content();
+        let data = handler.retrieve(&file).read_content();
 
         let storage = &data["storage"];
         let storage_name = storage["name"].as_str().unwrap();
@@ -118,9 +125,7 @@ mod toml_handler_on_validation {
         let mut handler = TOMLHandler::default();
         let dir = Base::init_path().get_base_directory();
         let file = format!("{}/{}", &dir, FILENAME);
-        let data = handler
-            .retrieve(&file)
-            .read_content();
+        let data = handler.retrieve(&file).read_content();
 
         let teleport = &data["teleports"];
         let storage = &data["storage"];
@@ -135,9 +140,7 @@ mod toml_handler_on_validation {
         let mut handler = TOMLHandler::default();
         let dir = Base::init_path().get_base_directory();
         let file = format!("{}/{}", &dir, FILENAME);
-        let data = handler
-            .retrieve(&file)
-            .read_content();
+        let data = handler.retrieve(&file).read_content();
 
         let teleport = &data["teleports"];
         let storage = &data["storage"];
@@ -150,7 +153,10 @@ mod toml_handler_on_validation {
 #[cfg(test)]
 mod toml_handler_on_modification {
     use std::{thread, time::Duration};
-    use tereporto::{toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs}, base::{Base, DirectoryControl}};
+    use tereporto::{
+        base::{Base, DirectoryControl},
+        toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs},
+    };
 
     const FILENAME: &str = "links.toml";
 
@@ -161,17 +167,20 @@ mod toml_handler_on_modification {
         let mut handler = TOMLHandler::default();
         let dir = Base::init_path().get_base_directory();
         let file = format!("{}/{}", &dir, FILENAME);
-        let mut data = handler
-            .retrieve(&file)
-            .read_content();
+        let mut data = handler.retrieve(&file).read_content();
 
-        handler.update(&mut data, TOMLUpdateArgs {
-            key: "teleports",
-            from: MappedField {
-                field: "directories",
-                value: "/a/du/dark/wa/123",
-            },
-        }).unwrap();
+        handler
+            .update(
+                &mut data,
+                TOMLUpdateArgs {
+                    key: "teleports",
+                    from: MappedField {
+                        field: "directories",
+                        value: "/a/du/dark/wa/123",
+                    },
+                },
+            )
+            .unwrap();
         let dirs = data["teleports"]["directories"].as_array().unwrap();
         assert!(dirs.len() > 1);
     }

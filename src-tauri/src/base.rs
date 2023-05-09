@@ -4,15 +4,13 @@ const STORE: &str = ".tereporto";
 
 #[derive(Debug, Clone)]
 pub struct Base {
-    pub directory: String
+    pub directory: String,
 }
 
 pub trait DirectoryControl {
     fn init_path() -> Self;
     fn get_root_directory() -> String;
     fn get_base_directory(self) -> String;
-    fn create_file(&mut self, filename: &str);
-    fn create_folder(dir: &str, name: &str);
 }
 
 impl DirectoryControl for Base {
@@ -24,7 +22,7 @@ impl DirectoryControl for Base {
         }
 
         Base {
-            directory: default_path
+            directory: default_path,
         }
     }
 
@@ -34,22 +32,5 @@ impl DirectoryControl for Base {
 
     fn get_base_directory(self) -> String {
         self.directory
-    }
-
-    fn create_file(&mut self, filename: &str) {
-        let file = format!("{}/{}", self.directory, filename);
-
-        // Create file if it doesn't exist
-        if !Path::new(&file).is_file() {
-            fs::File::create(&file).unwrap();
-        }
-    }
-
-    fn create_folder(dir: &str, name: &str) {
-        let folder = format!("{}/{}", dir, name);
-
-        if !Path::new(&folder).is_dir() {
-            fs::create_dir(&folder).unwrap();
-        }
     }
 }

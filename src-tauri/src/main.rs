@@ -5,8 +5,8 @@ mod hash_handler;
 mod storage;
 mod storage_cmd;
 mod teleport;
-mod toml_handler;
 mod teleport_cmd;
+mod toml_handler;
 
 use storage_cmd::{create_storage, update_storage};
 use teleport_cmd::{create_teleport, update_teleport};

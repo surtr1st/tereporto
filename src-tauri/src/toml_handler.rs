@@ -60,11 +60,15 @@ impl TOMLHandler {
         // Write the TOML string back to the original file (overwrite the file)
         match fs::write(&self.filename, updated_content) {
             Ok(f) => Ok(format!("Composed and updated file: {:#?}!", f)),
-            Err(_) => Err(String::from("Could not update or compose!"))
-        } 
+            Err(_) => Err(String::from("Could not update or compose!")),
+        }
     }
 
-    pub fn update(&mut self, content: &mut toml::Value, target: TOMLUpdateArgs) -> Result<String, String> {
+    pub fn update(
+        &mut self,
+        content: &mut toml::Value,
+        target: TOMLUpdateArgs,
+    ) -> Result<String, String> {
         // Update the array by specifying its key
         if let Some(table) = content
             .get_mut(target.key)
@@ -80,7 +84,7 @@ impl TOMLHandler {
 
         // Serialize the updated TOML back to a string
         let data =
-        toml::to_string_pretty(&content).expect("should be serialized the data back to string");
+            toml::to_string_pretty(&content).expect("should be serialized the data back to string");
 
         // Write the updated TOML back to the file
         self.compose(&data)
