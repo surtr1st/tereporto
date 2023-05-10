@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineAsyncComponent, ref } from 'vue';
+import { defineAsyncComponent, onMounted, ref, watch } from 'vue';
 import { StorageResponse, TeleportResponse } from './types';
 const Button = defineAsyncComponent(() => import('./components/Button.vue'));
 const ButtonGroup = defineAsyncComponent(
@@ -52,8 +52,8 @@ const TrashIcon = defineAsyncComponent(
 </script>
 <script setup lang="ts">
 const open = ref<boolean>(false);
-const teleport = ref<string>('');
-const storage = ref<string>('');
+const teleport = ref<string | string[]>('');
+const storage = ref<string | string[]>('');
 const teleports = ref<TeleportResponse[]>([]);
 const storages = ref<StorageResponse[]>([]);
 </script>

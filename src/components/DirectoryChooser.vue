@@ -16,8 +16,9 @@ async function openFileChooser() {
     multiple: true,
   });
   if (selected === null) return;
-  if (Array.isArray(selected)) emit('update:select', selected);
-  else emit('update:select', selected[0]);
+  if (Array.isArray(selected) && selected.length > 1)
+    emit('update:select', selected);
+  if (selected.length === 1) emit('update:select', selected[0]);
 }
 </script>
 
