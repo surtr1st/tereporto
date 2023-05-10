@@ -1,5 +1,6 @@
-<script setup lang="ts">
+<script lang="ts">
 import { defineAsyncComponent, ref } from 'vue';
+import { StorageResponse, TeleportResponse } from './types';
 const Button = defineAsyncComponent(() => import('./components/Button.vue'));
 const ButtonGroup = defineAsyncComponent(
   () => import('./components/ButtonGroup.vue'),
@@ -12,9 +13,6 @@ const Descriptive = defineAsyncComponent(
 );
 const DirectoryChooser = defineAsyncComponent(
   () => import('./components/DirectoryChooser.vue'),
-);
-const FileSelection = defineAsyncComponent(
-  () => import('./components/FileSelection.vue'),
 );
 const Flex = defineAsyncComponent(() => import('./components/Flex.vue'));
 const FunctionalPanel = defineAsyncComponent(
@@ -51,7 +49,13 @@ const TitleHeader = defineAsyncComponent(
 const TrashIcon = defineAsyncComponent(
   () => import('./components/Icon/TrashIcon.vue'),
 );
+</script>
+<script setup lang="ts">
 const open = ref<boolean>(false);
+const teleport = ref<string>('');
+const storage = ref<string>('');
+const teleports = ref<TeleportResponse[]>([]);
+const storages = ref<StorageResponse[]>([]);
 </script>
 
 <template>
@@ -82,17 +86,21 @@ const open = ref<boolean>(false);
       <Flex justify-content="flex-end">
         <TeleportPanel>
           <List>
-            <ListItem>
+            <ListItem
+              v-for="(teleport, index) in teleports"
+              :id="teleport.index"
+              :key="teleport.index"
+            >
               <Idol>
                 <FolderTransferIcon />
               </Idol>
               <Descriptive
-                title="Storage folder X"
-                description="usr/bede/123"
+                :title="teleport.name"
+                :description="teleport.directories"
               />
               <Button
                 rounded
-                name="teleport-trash-btn-"
+                :name="'teleport-trash-btn-' + index"
                 color="danger"
               >
                 <TrashIcon />
@@ -107,19 +115,20 @@ const open = ref<boolean>(false);
         <StoragePanel>
           <List>
             <ListItem
-              v-for="i in 15"
-              :id="i"
+              v-for="(storage, index) in storages"
+              :id="storage.index"
+              :key="storage.index"
             >
               <Idol>
                 <FolderDestinationIcon />
               </Idol>
               <Descriptive
-                title="Storage folder X"
-                description="usr/bede/123"
+                :title="storage.name"
+                :description="storage.directory"
               />
               <Button
                 rounded
-                :name="'storage-trash-btn-' + i"
+                :name="'storage-trash-btn-' + index"
                 color="danger"
               >
                 <TrashIcon />
@@ -137,10 +146,12 @@ const open = ref<boolean>(false);
           <DirectoryChooser
             label="New Teleport"
             name="teleport"
+            v-model:select="teleport"
           />
           <DirectoryChooser
             label="New Storage"
             name="storage"
+            v-model:select="storage"
           />
           <ButtonGroup>
             <Button

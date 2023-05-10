@@ -5,17 +5,19 @@ import { open } from '@tauri-apps/api/dialog';
 interface IDirectoryChooser {
   label?: string;
   name?: string;
+  onSelect?: () => void | Promise<void>;
 }
 defineProps<IDirectoryChooser>();
+const emit = defineEmits(['update:select']);
 
 async function openFileChooser() {
   const selected = await open({
     directory: true,
     multiple: true,
   });
-  if (Array.isArray(selected)) return;
   if (selected === null) return;
-  else return;
+  if (Array.isArray(selected)) emit('update:select', selected);
+  else emit('update:select', selected[0]);
 }
 </script>
 
