@@ -16,11 +16,11 @@ pub fn get_storages() -> Vec<Storage> {
             .retrieve(&filename)
             .read_content();
 
-        let part = content.get("storage");
-        if part.is_none() {
+        let section = content.get("storage");
+        if section.is_none() {
             continue;
         }
-        if let Some(storage) = part {
+        if let Some(storage) = section {
             if let Some(s) = storage.as_table() {
                 storages.push(Storage {
                     index: s.get("index").unwrap().to_string(),

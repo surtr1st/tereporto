@@ -16,11 +16,11 @@ pub fn get_teleports() -> Vec<Teleport> {
             .retrieve(&filename)
             .read_content();
 
-        let part = content.get("teleports");
-        if part.is_none() {
+        let section = content.get("teleports");
+        if section.is_none() {
             continue;
         }
-        if let Some(teleport) = part {
+        if let Some(teleport) = section {
             if let Some(t) = teleport.as_table() {
                 teleports.push(Teleport {
                     index: t.get("index").unwrap().to_string(),
