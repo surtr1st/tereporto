@@ -1,6 +1,7 @@
 <script lang="ts">
 import { defineAsyncComponent, onMounted, ref, watch } from 'vue';
 import { StorageResponse, TeleportResponse } from './types';
+import { useTeleport } from './server';
 const Button = defineAsyncComponent(() => import('./components/Button.vue'));
 const ButtonGroup = defineAsyncComponent(
   () => import('./components/ButtonGroup.vue'),
@@ -50,12 +51,38 @@ const TrashIcon = defineAsyncComponent(
   () => import('./components/Icon/TrashIcon.vue'),
 );
 </script>
+
 <script setup lang="ts">
 const open = ref<boolean>(false);
 const teleport = ref<string | string[]>('');
 const storage = ref<string | string[]>('');
-const teleports = ref<TeleportResponse[]>([]);
-const storages = ref<StorageResponse[]>([]);
+const teleports = ref<TeleportResponse[] | undefined>([]);
+const storages = ref<StorageResponse[] | undefined>([]);
+const { getTeleports, createTeleport } = useTeleport();
+
+function createNewTeleport() {
+  // Get the last element which is the folder name
+  const name = `${teleport.value}`.split('/').at(-1) as string;
+  let directories: string[] = [];
+
+  if (Array.isArray(teleport.value)) directories = teleport.value;
+  else directories.push(teleport.value);
+
+  createTeleport({ name, directories })
+    .then((rs) => console.log(rs))
+    .catch((e) => console.log(e));
+}
+
+watch(teleport, (newTeleport, oldTeleport) => {
+  if (newTeleport.length === 0) return;
+  createNewTeleport();
+});
+
+// onMounted(() => {
+//   getTeleports()
+//     .then((res) => (teleports.value = res))
+//     .catch((e) => console.log(e));
+// });
 </script>
 
 <template>

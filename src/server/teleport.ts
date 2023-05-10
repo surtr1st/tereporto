@@ -4,7 +4,7 @@ import { Teleport, TeleportResponse, TeleportUpdateArgs } from '../types';
 export function useTeleport() {
   const getTeleports = async () => {
     try {
-      return await invoke<TeleportResponse>('get_teleports');
+      return await invoke<TeleportResponse[]>('get_teleports');
     } catch (e) {
       console.log(e);
     }

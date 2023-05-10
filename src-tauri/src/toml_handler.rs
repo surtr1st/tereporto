@@ -19,7 +19,7 @@ pub struct TOMLUpdateArgs<'tua> {
 
 impl TOMLHandler {
     pub fn create_file(&mut self, dir: &str, filename: &str) -> &mut TOMLHandler {
-        let file = format!("{}/{}", dir, filename);
+        let file = format!("{}/{}.toml", dir, filename);
 
         // Create file if it doesn't exist
         if !Path::new(&file).is_file() {
