@@ -1,21 +1,93 @@
+<script lang="ts">
+import { defineAsyncComponent, onMounted, ref, watch } from 'vue';
+import { StorageResponse, TeleportResponse } from './types';
+import { useTeleport } from './server';
+const Button = defineAsyncComponent(() => import('./components/Button.vue'));
+const ButtonGroup = defineAsyncComponent(
+  () => import('./components/ButtonGroup.vue'),
+);
+const Checkbox = defineAsyncComponent(
+  () => import('./components/Checkbox.vue'),
+);
+const Descriptive = defineAsyncComponent(
+  () => import('./components/Descriptive.vue'),
+);
+const DirectoryChooser = defineAsyncComponent(
+  () => import('./components/DirectoryChooser.vue'),
+);
+const Flex = defineAsyncComponent(() => import('./components/Flex.vue'));
+const FunctionalPanel = defineAsyncComponent(
+  () => import('./components/FunctionalPanel.vue'),
+);
+const Grid = defineAsyncComponent(() => import('./components/Grid.vue'));
+const GridItem = defineAsyncComponent(
+  () => import('./components/GridItem.vue'),
+);
+const Idol = defineAsyncComponent(() => import('./components/Idol.vue'));
+const FolderTransferIcon = defineAsyncComponent(
+  () => import('./components/Icon/FolderTransferIcon.vue'),
+);
+const FolderDestinationIcon = defineAsyncComponent(
+  () => import('./components/Icon/FolderDestinationIcon.vue'),
+);
+const List = defineAsyncComponent(() => import('./components/List.vue'));
+const ListItem = defineAsyncComponent(
+  () => import('./components/ListItem.vue'),
+);
+const Modal = defineAsyncComponent(() => import('./components/Modal.vue'));
+const ModalFooter = defineAsyncComponent(
+  () => import('./components/ModalFooter.vue'),
+);
+const StoragePanel = defineAsyncComponent(
+  () => import('./components/StoragePanel.vue'),
+);
+const TeleportPanel = defineAsyncComponent(
+  () => import('./components/TeleportPanel.vue'),
+);
+const TitleHeader = defineAsyncComponent(
+  () => import('./components/TitleHeader.vue'),
+);
+const TrashIcon = defineAsyncComponent(
+  () => import('./components/Icon/TrashIcon.vue'),
+);
+</script>
+
 <script setup lang="ts">
-import Button from './components/Button.vue';
-import ButtonGroup from './components/ButtonGroup.vue';
-import Checkbox from './components/Checkbox.vue';
-import Descriptive from './components/Descriptive.vue';
-import Flex from './components/Flex.vue';
-import FunctionalPanel from './components/FunctionalPanel.vue';
-import Grid from './components/Grid.vue';
-import GridItem from './components/GridItem.vue';
-import Idol from './components/Idol.vue';
-import List from './components/List.vue';
-import ListItem from './components/ListItem.vue';
-import Modal from './components/Modal.vue';
-import StoragePanel from './components/StoragePanel.vue';
-import TeleportPanel from './components/TeleportPanel.vue';
-import TitleHeader from './components/TitleHeader.vue';
-import { ref } from 'vue';
 const open = ref<boolean>(false);
+const teleport = ref<string | string[]>('');
+const storage = ref<string | string[]>('');
+const teleports = ref<TeleportResponse[] | undefined>([]);
+const storages = ref<StorageResponse[] | undefined>([]);
+const { getTeleports, createTeleport } = useTeleport();
+
+function retrieveTeleports() {
+  getTeleports()
+    .then((res) => (teleports.value = res))
+    .catch((e) => console.log(e));
+}
+
+function createNewTeleport() {
+  // Get the last element which is the folder name
+  const name = `${teleport.value}`.split('/').at(-1) as string;
+  let directories: string[] = [];
+
+  if (Array.isArray(teleport.value)) directories = teleport.value;
+  else directories.push(teleport.value);
+
+  createTeleport({ name, directories, to: '' })
+    .then((rs) => console.log(rs))
+    .catch((e) => console.log(e));
+}
+
+watch(teleport, (newTeleport, _oldTeleport) => {
+  if (newTeleport.length === 0) return;
+  createNewTeleport();
+  retrieveTeleports();
+});
+
+onMounted(() => {
+  retrieveTeleports();
+});
 </script>
 
 <template>
@@ -46,16 +118,25 @@ const open = ref<boolean>(false);
       <Flex justify-content="flex-end">
         <TeleportPanel>
           <List>
-            <ListItem>
-              <Idol />
+            <ListItem
+              v-for="(teleport, index) in teleports"
+              :id="teleport.index"
+              :key="teleport.index"
+            >
+              <Idol>
+                <FolderTransferIcon />
+              </Idol>
               <Descriptive
-                title="Storage folder X"
-                description="usr/bede/123"
+                :title="teleport.name"
+                :description="teleport.directories"
               />
               <Button
                 rounded
+                :name="'teleport-trash-btn-' + index"
                 color="danger"
-              />
+              >
+                <TrashIcon />
+              </Button>
             </ListItem>
           </List>
         </TeleportPanel>
@@ -66,18 +147,24 @@ const open = ref<boolean>(false);
         <StoragePanel>
           <List>
             <ListItem
-              v-for="i in 15"
-              :id="i"
+              v-for="(storage, index) in storages"
+              :id="storage.index"
+              :key="storage.index"
             >
-              <Idol />
+              <Idol>
+                <FolderDestinationIcon />
+              </Idol>
               <Descriptive
-                title="Storage folder X"
-                description="usr/bede/123"
+                :title="storage.name"
+                :description="storage.directory"
               />
               <Button
                 rounded
+                :name="'storage-trash-btn-' + index"
                 color="danger"
-              />
+              >
+                <TrashIcon />
+              </Button>
             </ListItem>
           </List>
         </StoragePanel>
@@ -88,25 +175,25 @@ const open = ref<boolean>(false);
         <FunctionalPanel>
           <Checkbox label="Start along side with OS" />
           <Checkbox label="Auto-scan" />
-          <Button
+          <DirectoryChooser
             label="New Teleport"
-            color="darker"
-            rounded
-            larger
+            name="teleport"
+            v-model:select="teleport"
           />
-          <Button
+          <DirectoryChooser
             label="New Storage"
-            color="darker"
-            rounded
-            larger
+            name="storage"
+            v-model:select="storage"
           />
           <ButtonGroup>
             <Button
+              name="scan-btn"
               label="Scan Teleport"
               color="darker"
               larger
             />
             <Button
+              name="choose-btn"
               label="Choose"
               color="darker"
               larger
@@ -117,5 +204,18 @@ const open = ref<boolean>(false);
       </Flex>
     </GridItem>
   </Grid>
-  <Modal :open="open" />
+  <Modal
+    :open="open"
+    title="Test"
+    @close="open = false"
+  >
+    <ModalFooter>
+      <Button
+        label="Test"
+        color="darker"
+        rounded
+        larger
+      />
+    </ModalFooter>
+  </Modal>
 </template>

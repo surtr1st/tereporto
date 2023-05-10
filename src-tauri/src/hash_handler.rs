@@ -9,7 +9,7 @@ impl HashHandler {
         hex::encode(hash)
     }
 
-    pub fn compare(target: &str, original: &str) -> bool {
+    pub fn _compare(target: &str, original: &str) -> bool {
         let from_hashed = hex::decode(target).unwrap();
         let from_original = Sha256::new().chain_update(original).finalize();
         from_original.as_slice() == from_hashed

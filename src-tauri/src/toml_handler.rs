@@ -1,12 +1,11 @@
-use std::{env, fs, path::Path};
+use std::{fs, path::Path};
 
 #[derive(Debug, Default, Clone)]
 pub struct TOMLHandler {
-    pub directory: String,
     pub filename: String,
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct MappedField<'mf> {
     pub field: &'mf str,
     pub value: &'mf str,
@@ -19,52 +18,33 @@ pub struct TOMLUpdateArgs<'tua> {
 }
 
 impl TOMLHandler {
-    pub fn new(filename: &str) -> Self {
-        let root = env::var("HOME").unwrap();
-        let store_folder = ".tereporto";
-        let default_path = format!("{}/{}", root, store_folder);
-        let default_file = format!("{}/{}", default_path, filename);
-
-        // Create directory if it doesn't exist
-        if !Path::new(&default_path).is_dir() {
-            fs::create_dir(&default_path).unwrap();
-        }
+    pub fn create_file(&mut self, dir: &str, filename: &str) -> &mut TOMLHandler {
+        let file = format!("{}/{}.toml", dir, filename);
 
         // Create file if it doesn't exist
-        if !Path::new(&default_file).is_file() {
-            fs::File::create(&default_file).unwrap();
+        if !Path::new(&file).is_file() {
+            fs::File::create(&file).unwrap();
         }
 
-        TOMLHandler {
-            directory: default_path,
-            filename: filename.to_string(),
-        }
+        self.filename = file;
+        self
     }
 
-    pub fn change_default_directory(&mut self, dir: &str) {
-        self.directory = dir.to_string();
+    pub fn retrieve(&mut self, filename: &str) -> &mut TOMLHandler {
+        self.filename = filename.to_string();
+        self
     }
 
-    pub fn read_from_file(self) -> toml::Value {
-        let file = format!("{}/{}", self.directory, self.filename);
-        let content = fs::read_to_string(file).unwrap();
+    pub fn read_content(&self) -> toml::Value {
+        let content = fs::read_to_string(&self.filename).unwrap();
         // Parse the TOML string into `toml::Value`
         content
             .parse::<toml::Value>()
             .expect("should be parsed TOML string into toml::Value")
     }
 
-    pub fn compose(self, target: &str) {
-        let file = format!("{}/{}", self.directory, self.filename);
-
-        // Read the TOML file
-        let current_content =
-            fs::read_to_string(&file).unwrap_or_else(|_| panic!("should have read file: {}", self.filename));
-
-        // Parse the TOML string into a `toml::Value`
-        let mut table = current_content
-            .parse::<toml::Value>()
-            .expect("should be parsed TOML string into toml::Value");
+    pub fn compose(&mut self, target: &str) -> Result<String, String> {
+        let mut table = self.read_content();
 
         // Modify the parsed TOML value by adding or updating the desired fields
         let additional_content = target.parse::<toml::Value>().unwrap();
@@ -78,20 +58,17 @@ impl TOMLHandler {
         let updated_content = toml::to_string_pretty(&table).unwrap();
 
         // Write the TOML string back to the original file (overwrite the file)
-        fs::write(file, updated_content).unwrap();
+        match fs::write(&self.filename, updated_content) {
+            Ok(f) => Ok(format!("Composed and updated file: {:#?}!", f)),
+            Err(_) => Err(String::from("Could not update or compose!")),
+        }
     }
 
-    pub fn update(self, target: TOMLUpdateArgs) {
-        let file = format!("{}/{}", self.directory, self.filename);
-
-        // Read the TOML file
-        let mut data =
-            fs::read_to_string(file).unwrap_or_else(|_| panic!("should have read file: {}", self.filename));
-
-        // Parse the TOML into a `toml::Value`
-        let mut content: toml::Value =
-            toml::from_str(&data).expect("should be parsed TOML string into toml::Value");
-
+    pub fn update(
+        &mut self,
+        content: &mut toml::Value,
+        target: TOMLUpdateArgs,
+    ) -> Result<String, String> {
         // Update the array by specifying its key
         if let Some(table) = content
             .get_mut(target.key)
@@ -106,10 +83,10 @@ impl TOMLHandler {
         }
 
         // Serialize the updated TOML back to a string
-        data =
+        let data =
             toml::to_string_pretty(&content).expect("should be serialized the data back to string");
 
         // Write the updated TOML back to the file
-        self.compose(&data);
+        self.compose(&data)
     }
 }

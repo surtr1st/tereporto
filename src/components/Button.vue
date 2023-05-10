@@ -7,7 +7,7 @@ interface IButton {
   color?: 'neutral' | 'darker' | 'danger';
   rounded?: boolean;
   larger?: boolean;
-  onClick?: () => void | Promise<void>;
+  onClick?: () => void | string | Promise<void | string>;
 }
 const { larger, rounded, color } = defineProps<IButton>();
 
@@ -24,6 +24,8 @@ if (larger) className.value += ' tp__button--larger';
     v-if="color === 'darker'"
     :class="className"
     :name="name"
+    :aria-label="name"
+    :title="label"
     @click="onClick"
   >
     <slot />
@@ -33,6 +35,8 @@ if (larger) className.value += ' tp__button--larger';
     v-else-if="color === 'neutral'"
     :class="className"
     :name="name"
+    :aria-label="name"
+    :title="label"
     @click="onClick"
   >
     <slot />
@@ -42,6 +46,8 @@ if (larger) className.value += ' tp__button--larger';
     v-else
     :class="className"
     :name="name"
+    :aria-label="name"
+    :title="label"
     @click="onClick"
   >
     <slot />
@@ -55,7 +61,6 @@ if (larger) className.value += ' tp__button--larger';
   min-height: 38px;
   border: none;
   margin: 0.1rem;
-  padding: 0.5rem;
   transition: all 250ms;
   font-weight: 500;
 }
