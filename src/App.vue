@@ -60,6 +60,12 @@ const teleports = ref<TeleportResponse[] | undefined>([]);
 const storages = ref<StorageResponse[] | undefined>([]);
 const { getTeleports, createTeleport } = useTeleport();
 
+function retrieveTeleports() {
+  getTeleports()
+    .then((res) => (teleports.value = res))
+    .catch((e) => console.log(e));
+}
+
 function createNewTeleport() {
   // Get the last element which is the folder name
   const name = `${teleport.value}`.split('/').at(-1) as string;
@@ -68,21 +74,20 @@ function createNewTeleport() {
   if (Array.isArray(teleport.value)) directories = teleport.value;
   else directories.push(teleport.value);
 
-  createTeleport({ name, directories })
+  createTeleport({ name, directories, to: '' })
     .then((rs) => console.log(rs))
     .catch((e) => console.log(e));
 }
 
-watch(teleport, (newTeleport, oldTeleport) => {
+watch(teleport, (newTeleport, _oldTeleport) => {
   if (newTeleport.length === 0) return;
   createNewTeleport();
+  retrieveTeleports();
 });
 
-// onMounted(() => {
-//   getTeleports()
-//     .then((res) => (teleports.value = res))
-//     .catch((e) => console.log(e));
-// });
+onMounted(() => {
+  retrieveTeleports();
+});
 </script>
 
 <template>
