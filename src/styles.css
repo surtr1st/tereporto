@@ -26,6 +26,23 @@
   scroll-behavior: smooth;
 }
 
+svg {
+  background: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--darker-color);
+  border-radius: 2rem;
+}
+
+::-webkit-scrollbar-track {
+  width: 5px;
+}
+
 /**
   * Split
   *

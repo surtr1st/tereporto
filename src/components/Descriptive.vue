@@ -32,7 +32,7 @@ defineProps<IDescriptive>();
 
 .tp__descriptive > p {
   font-style: italic;
-  color: #7b7b7b;
+  color: #884452;
   font-size: 13px;
   background: inherit;
 }
