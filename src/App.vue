@@ -10,6 +10,9 @@ const Checkbox = defineAsyncComponent(
 const Descriptive = defineAsyncComponent(
   () => import('./components/Descriptive.vue'),
 );
+const DirectoryChooser = defineAsyncComponent(
+  () => import('./components/DirectoryChooser.vue'),
+);
 const FileSelection = defineAsyncComponent(
   () => import('./components/FileSelection.vue'),
 );
@@ -131,11 +134,11 @@ const open = ref<boolean>(false);
         <FunctionalPanel>
           <Checkbox label="Start along side with OS" />
           <Checkbox label="Auto-scan" />
-          <FileSelection
+          <DirectoryChooser
             label="New Teleport"
             name="teleport"
           />
-          <FileSelection
+          <DirectoryChooser
             label="New Storage"
             name="storage"
           />

@@ -4,6 +4,15 @@ interface IFileSelection {
   name?: string;
 }
 defineProps<IFileSelection>();
+
+async function upload(e: Event) {
+  const files = (e.target as HTMLInputElement).files;
+  if (!files) return;
+  if (files.length > 0) {
+    const folderPath = files[0].webkitRelativePath;
+    console.log(folderPath);
+  }
+}
 </script>
 
 <template>
@@ -17,6 +26,8 @@ defineProps<IFileSelection>();
     type="file"
     :id="name"
     :name="name"
+    multiple
+    @change="upload"
   />
 </template>
 

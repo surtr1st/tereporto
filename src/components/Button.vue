@@ -7,7 +7,7 @@ interface IButton {
   color?: 'neutral' | 'darker' | 'danger';
   rounded?: boolean;
   larger?: boolean;
-  onClick?: () => void | Promise<void>;
+  onClick?: () => void | string | Promise<void | string>;
 }
 const { larger, rounded, color } = defineProps<IButton>();
 
