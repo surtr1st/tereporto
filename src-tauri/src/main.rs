@@ -9,7 +9,7 @@ mod teleport_cmd;
 mod toml_handler;
 
 use base::{Base, DirectoryControl};
-use storage_cmd::{create_storage, update_storage};
+use storage_cmd::{get_storages, create_storage, update_storage};
 use teleport_cmd::{get_teleports, create_teleport, update_teleport};
 
 use tauri::{
@@ -24,6 +24,7 @@ fn main() {
         .on_system_tray_event(handle_system_tray)
         .on_window_event(prevent_frontend_on_close)
         .invoke_handler(tauri::generate_handler![
+            get_storages,
             create_storage,
             update_storage,
             get_teleports,

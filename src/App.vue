@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineAsyncComponent, onMounted, ref, watch } from 'vue';
 import { StorageResponse, TeleportResponse } from './types';
-import { useTeleport } from './server';
+import { useStorage, useTeleport } from './server';
 const Button = defineAsyncComponent(() => import('./components/Button.vue'));
 const ButtonGroup = defineAsyncComponent(
   () => import('./components/ButtonGroup.vue'),
@@ -59,10 +59,19 @@ const storage = ref<string | string[]>('');
 const teleports = ref<TeleportResponse[] | undefined>([]);
 const storages = ref<StorageResponse[] | undefined>([]);
 const { getTeleports, createTeleport } = useTeleport();
+const { getStorages, createStorage } = useStorage();
+
+const removeQuotes = (target: string) => target.replaceAll('"', '');
 
 function retrieveTeleports() {
   getTeleports()
     .then((res) => (teleports.value = res))
+    .catch((e) => console.log(e));
+}
+
+function retrieveStorages() {
+  getStorages()
+    .then((res) => (storages.value = res))
     .catch((e) => console.log(e));
 }
 
@@ -74,9 +83,23 @@ function createNewTeleport() {
   if (Array.isArray(teleport.value)) directories = teleport.value;
   else directories.push(teleport.value);
 
-  createTeleport({ name, directories, to: '' })
+  createTeleport({ name, directories })
     .then((rs) => console.log(rs))
     .catch((e) => console.log(e));
+}
+
+function createNewStorage() {
+  const name = `${storage.value}`.split('/').at(-1) as string;
+  let directories: string[] = [];
+
+  if (Array.isArray(storage.value)) directories = storage.value;
+  else directories.push(storage.value);
+
+  directories.forEach((directory) =>
+    createStorage({ name, directory })
+      .then((rs) => console.log(rs))
+      .catch((e) => console.log(e)),
+  );
 }
 
 watch(teleport, (newTeleport, _oldTeleport) => {
@@ -85,8 +108,15 @@ watch(teleport, (newTeleport, _oldTeleport) => {
   retrieveTeleports();
 });
 
+watch(storage, (newStorage, _oldStorage) => {
+  if (newStorage.length === 0) return;
+  createNewStorage();
+  retrieveStorages();
+});
+
 onMounted(() => {
   retrieveTeleports();
+  retrieveStorages();
 });
 </script>
 
@@ -127,7 +157,7 @@ onMounted(() => {
                 <FolderTransferIcon />
               </Idol>
               <Descriptive
-                :title="teleport.name"
+                :title="removeQuotes(teleport.name)"
                 :description="teleport.directories"
               />
               <Button
@@ -155,8 +185,8 @@ onMounted(() => {
                 <FolderDestinationIcon />
               </Idol>
               <Descriptive
-                :title="storage.name"
-                :description="storage.directory"
+                :title="removeQuotes(storage.name)"
+                :description="removeQuotes(storage.directory)"
               />
               <Button
                 rounded

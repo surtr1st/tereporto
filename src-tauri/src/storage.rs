@@ -7,6 +7,7 @@ pub struct Storage {
     pub name: String,
     pub directory: String,
     pub constraint: Option<String>,
+    pub color: Option<String>,
 }
 
 #[derive(Debug, Default, serde::Serialize)]
@@ -19,6 +20,7 @@ pub struct StorageArgs {
     pub name: String,
     pub directory: String,
     pub constraint: Option<String>,
+    pub color: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -26,6 +28,7 @@ pub struct NewStorage<'ns> {
     pub name: &'ns str,
     pub directory: &'ns str,
     pub constraint: Option<String>,
+    pub color: Option<String>,
 }
 
 impl Storage {
@@ -36,6 +39,7 @@ impl Storage {
                 name: s.name.to_string(),
                 directory: s.directory.to_string(),
                 constraint: s.constraint,
+                color: s.color
             },
         };
         toml::to_string_pretty(&storage).unwrap()
