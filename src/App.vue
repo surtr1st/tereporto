@@ -18,9 +18,15 @@ const FunctionalPanel = defineAsyncComponent(
   () => import('./components/FunctionalPanel.vue'),
 );
 const Grid = defineAsyncComponent(() => import('./components/Grid.vue'));
-const Idol = defineAsyncComponent(() => import('./components/Idol.vue'));
 const GridItem = defineAsyncComponent(
   () => import('./components/GridItem.vue'),
+);
+const Idol = defineAsyncComponent(() => import('./components/Idol.vue'));
+const FolderTransferIcon = defineAsyncComponent(
+  () => import('./components/Icon/FolderTransferIcon.vue'),
+);
+const FolderDestinationIcon = defineAsyncComponent(
+  () => import('./components/Icon/FolderDestinationIcon.vue'),
 );
 const List = defineAsyncComponent(() => import('./components/List.vue'));
 const ListItem = defineAsyncComponent(
@@ -40,7 +46,7 @@ const TitleHeader = defineAsyncComponent(
   () => import('./components/TitleHeader.vue'),
 );
 const TrashIcon = defineAsyncComponent(
-  () => import('./components/TrashIcon.vue'),
+  () => import('./components/Icon/TrashIcon.vue'),
 );
 const open = ref<boolean>(false);
 </script>
@@ -74,7 +80,9 @@ const open = ref<boolean>(false);
         <TeleportPanel>
           <List>
             <ListItem>
-              <Idol />
+              <Idol>
+                <FolderTransferIcon />
+              </Idol>
               <Descriptive
                 title="Storage folder X"
                 description="usr/bede/123"
@@ -99,7 +107,9 @@ const open = ref<boolean>(false);
               v-for="i in 15"
               :id="i"
             >
-              <Idol />
+              <Idol>
+                <FolderDestinationIcon />
+              </Idol>
               <Descriptive
                 title="Storage folder X"
                 description="usr/bede/123"
