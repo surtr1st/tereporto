@@ -1,5 +1,7 @@
-<script setup lang="ts">
-import { defineAsyncComponent, ref } from 'vue';
+<script lang="ts">
+import { defineAsyncComponent, onMounted, ref, watch } from 'vue';
+import { StorageResponse, TeleportResponse } from './types';
+import { useTeleport } from './server';
 const Button = defineAsyncComponent(() => import('./components/Button.vue'));
 const ButtonGroup = defineAsyncComponent(
   () => import('./components/ButtonGroup.vue'),
@@ -12,9 +14,6 @@ const Descriptive = defineAsyncComponent(
 );
 const DirectoryChooser = defineAsyncComponent(
   () => import('./components/DirectoryChooser.vue'),
-);
-const FileSelection = defineAsyncComponent(
-  () => import('./components/FileSelection.vue'),
 );
 const Flex = defineAsyncComponent(() => import('./components/Flex.vue'));
 const FunctionalPanel = defineAsyncComponent(
@@ -51,7 +50,44 @@ const TitleHeader = defineAsyncComponent(
 const TrashIcon = defineAsyncComponent(
   () => import('./components/Icon/TrashIcon.vue'),
 );
+</script>
+
+<script setup lang="ts">
 const open = ref<boolean>(false);
+const teleport = ref<string | string[]>('');
+const storage = ref<string | string[]>('');
+const teleports = ref<TeleportResponse[] | undefined>([]);
+const storages = ref<StorageResponse[] | undefined>([]);
+const { getTeleports, createTeleport } = useTeleport();
+
+function retrieveTeleports() {
+  getTeleports()
+    .then((res) => (teleports.value = res))
+    .catch((e) => console.log(e));
+}
+
+function createNewTeleport() {
+  // Get the last element which is the folder name
+  const name = `${teleport.value}`.split('/').at(-1) as string;
+  let directories: string[] = [];
+
+  if (Array.isArray(teleport.value)) directories = teleport.value;
+  else directories.push(teleport.value);
+
+  createTeleport({ name, directories, to: '' })
+    .then((rs) => console.log(rs))
+    .catch((e) => console.log(e));
+}
+
+watch(teleport, (newTeleport, _oldTeleport) => {
+  if (newTeleport.length === 0) return;
+  createNewTeleport();
+  retrieveTeleports();
+});
+
+onMounted(() => {
+  retrieveTeleports();
+});
 </script>
 
 <template>
@@ -82,17 +118,21 @@ const open = ref<boolean>(false);
       <Flex justify-content="flex-end">
         <TeleportPanel>
           <List>
-            <ListItem>
+            <ListItem
+              v-for="(teleport, index) in teleports"
+              :id="teleport.index"
+              :key="teleport.index"
+            >
               <Idol>
                 <FolderTransferIcon />
               </Idol>
               <Descriptive
-                title="Storage folder X"
-                description="usr/bede/123"
+                :title="teleport.name"
+                :description="teleport.directories"
               />
               <Button
                 rounded
-                name="teleport-trash-btn-"
+                :name="'teleport-trash-btn-' + index"
                 color="danger"
               >
                 <TrashIcon />
@@ -107,19 +147,20 @@ const open = ref<boolean>(false);
         <StoragePanel>
           <List>
             <ListItem
-              v-for="i in 15"
-              :id="i"
+              v-for="(storage, index) in storages"
+              :id="storage.index"
+              :key="storage.index"
             >
               <Idol>
                 <FolderDestinationIcon />
               </Idol>
               <Descriptive
-                title="Storage folder X"
-                description="usr/bede/123"
+                :title="storage.name"
+                :description="storage.directory"
               />
               <Button
                 rounded
-                :name="'storage-trash-btn-' + i"
+                :name="'storage-trash-btn-' + index"
                 color="danger"
               >
                 <TrashIcon />
@@ -137,10 +178,12 @@ const open = ref<boolean>(false);
           <DirectoryChooser
             label="New Teleport"
             name="teleport"
+            v-model:select="teleport"
           />
           <DirectoryChooser
             label="New Storage"
             name="storage"
+            v-model:select="storage"
           />
           <ButtonGroup>
             <Button

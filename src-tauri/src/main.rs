@@ -8,8 +8,9 @@ mod teleport;
 mod teleport_cmd;
 mod toml_handler;
 
+use base::{Base, DirectoryControl};
 use storage_cmd::{create_storage, update_storage};
-use teleport_cmd::{create_teleport, update_teleport};
+use teleport_cmd::{get_teleports, create_teleport, update_teleport};
 
 use tauri::{
     AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, RunEvent, SystemTray, SystemTrayEvent,
@@ -17,6 +18,7 @@ use tauri::{
 };
 
 fn main() {
+    Base::init_path();
     tauri::Builder::default()
         .system_tray(create_system_tray())
         .on_system_tray_event(handle_system_tray)
@@ -24,6 +26,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             create_storage,
             update_storage,
+            get_teleports,
             create_teleport,
             update_teleport
         ])

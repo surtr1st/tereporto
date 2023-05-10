@@ -1,7 +1,7 @@
 <script setup lang="ts">
 interface IDescriptive {
   title?: string;
-  description?: string;
+  description?: string | string[];
   onAction?: () => void | Promise<void>;
 }
 defineProps<IDescriptive>();
