@@ -1,21 +1,53 @@
 <script setup lang="ts">
-import Button from './components/Button.vue';
-import ButtonGroup from './components/ButtonGroup.vue';
-import Checkbox from './components/Checkbox.vue';
-import Descriptive from './components/Descriptive.vue';
-import Flex from './components/Flex.vue';
-import FunctionalPanel from './components/FunctionalPanel.vue';
-import Grid from './components/Grid.vue';
-import GridItem from './components/GridItem.vue';
-import Idol from './components/Idol.vue';
-import List from './components/List.vue';
-import ListItem from './components/ListItem.vue';
-import Modal from './components/Modal.vue';
-import ModalFooter from './components/ModalFooter.vue';
-import StoragePanel from './components/StoragePanel.vue';
-import TeleportPanel from './components/TeleportPanel.vue';
-import TitleHeader from './components/TitleHeader.vue';
-import { ref } from 'vue';
+import { defineAsyncComponent, ref } from 'vue';
+const Button = defineAsyncComponent(() => import('./components/Button.vue'));
+const ButtonGroup = defineAsyncComponent(
+  () => import('./components/ButtonGroup.vue'),
+);
+const Checkbox = defineAsyncComponent(
+  () => import('./components/Checkbox.vue'),
+);
+const Descriptive = defineAsyncComponent(
+  () => import('./components/Descriptive.vue'),
+);
+const FileSelection = defineAsyncComponent(
+  () => import('./components/FileSelection.vue'),
+);
+const Flex = defineAsyncComponent(() => import('./components/Flex.vue'));
+const FunctionalPanel = defineAsyncComponent(
+  () => import('./components/FunctionalPanel.vue'),
+);
+const Grid = defineAsyncComponent(() => import('./components/Grid.vue'));
+const GridItem = defineAsyncComponent(
+  () => import('./components/GridItem.vue'),
+);
+const Idol = defineAsyncComponent(() => import('./components/Idol.vue'));
+const FolderTransferIcon = defineAsyncComponent(
+  () => import('./components/Icon/FolderTransferIcon.vue'),
+);
+const FolderDestinationIcon = defineAsyncComponent(
+  () => import('./components/Icon/FolderDestinationIcon.vue'),
+);
+const List = defineAsyncComponent(() => import('./components/List.vue'));
+const ListItem = defineAsyncComponent(
+  () => import('./components/ListItem.vue'),
+);
+const Modal = defineAsyncComponent(() => import('./components/Modal.vue'));
+const ModalFooter = defineAsyncComponent(
+  () => import('./components/ModalFooter.vue'),
+);
+const StoragePanel = defineAsyncComponent(
+  () => import('./components/StoragePanel.vue'),
+);
+const TeleportPanel = defineAsyncComponent(
+  () => import('./components/TeleportPanel.vue'),
+);
+const TitleHeader = defineAsyncComponent(
+  () => import('./components/TitleHeader.vue'),
+);
+const TrashIcon = defineAsyncComponent(
+  () => import('./components/Icon/TrashIcon.vue'),
+);
 const open = ref<boolean>(false);
 </script>
 
@@ -48,15 +80,20 @@ const open = ref<boolean>(false);
         <TeleportPanel>
           <List>
             <ListItem>
-              <Idol />
+              <Idol>
+                <FolderTransferIcon />
+              </Idol>
               <Descriptive
                 title="Storage folder X"
                 description="usr/bede/123"
               />
               <Button
                 rounded
+                name="teleport-trash-btn-"
                 color="danger"
-              />
+              >
+                <TrashIcon />
+              </Button>
             </ListItem>
           </List>
         </TeleportPanel>
@@ -70,15 +107,20 @@ const open = ref<boolean>(false);
               v-for="i in 15"
               :id="i"
             >
-              <Idol />
+              <Idol>
+                <FolderDestinationIcon />
+              </Idol>
               <Descriptive
                 title="Storage folder X"
                 description="usr/bede/123"
               />
               <Button
                 rounded
+                :name="'storage-trash-btn-' + i"
                 color="danger"
-              />
+              >
+                <TrashIcon />
+              </Button>
             </ListItem>
           </List>
         </StoragePanel>
@@ -89,25 +131,23 @@ const open = ref<boolean>(false);
         <FunctionalPanel>
           <Checkbox label="Start along side with OS" />
           <Checkbox label="Auto-scan" />
-          <Button
+          <FileSelection
             label="New Teleport"
-            color="darker"
-            rounded
-            larger
+            name="teleport"
           />
-          <Button
+          <FileSelection
             label="New Storage"
-            color="darker"
-            rounded
-            larger
+            name="storage"
           />
           <ButtonGroup>
             <Button
+              name="scan-btn"
               label="Scan Teleport"
               color="darker"
               larger
             />
             <Button
+              name="choose-btn"
               label="Choose"
               color="darker"
               larger
