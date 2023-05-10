@@ -10,28 +10,28 @@ pub fn get_storages() -> Vec<Storage> {
     let mut storages = vec![];
 
     let dir = Base::init_path().get_base_directory();
-    fs::read_dir(dir).unwrap()
-        .for_each(|file| {
-            let filename = file.unwrap().path().display().to_string();
-            let content = handler
-                .retrieve(&filename)
-                .read_content();
+    for file in fs::read_dir(dir).unwrap() {
+        let filename = file.unwrap().path().display().to_string();
+        let content = handler
+            .retrieve(&filename)
+            .read_content();
 
-            let part = content.get("storage");
-            if part.is_some() {
-                if let Some(storage) = part {
-                    if let Some(s) = storage.as_table() {
-                        storages.push(Storage {
-                            index: s.get("index").unwrap().to_string(),
-                            name: s.get("name").unwrap().to_string(),
-                            directory: s.get("directory").unwrap().to_string(),
-                            constraint: s.get("constraint").is_none().then(|| String::from("")),
-                            color: s.get("color").is_none().then(|| String::from(""))
-                        });
-                    }
-                }
+        let part = content.get("storage");
+        if part.is_none() {
+            continue;
+        }
+        if let Some(storage) = part {
+            if let Some(s) = storage.as_table() {
+                storages.push(Storage {
+                    index: s.get("index").unwrap().to_string(),
+                    name: s.get("name").unwrap().to_string(),
+                    directory: s.get("directory").unwrap().to_string(),
+                    constraint: s.get("constraint").is_none().then(|| String::from("")),
+                    color: s.get("color").is_none().then(|| String::from(""))
+                });
             }
-        });
+        }
+    }
 
     storages
 }
