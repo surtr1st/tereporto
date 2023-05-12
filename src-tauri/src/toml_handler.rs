@@ -74,6 +74,14 @@ impl TOMLHandler {
             .get_mut(target.key)
             .and_then(|value| value.as_table_mut())
         {
+            let field = table.get_mut(target.to.field);
+            if field.is_some() {
+                *field.unwrap() = toml::Value::from(target.to.value.to_string());
+            }
+            else {
+                table.insert(target.to.field.to_owned(), toml::Value::String(target.to.value.to_string()));
+            }
+
             if let Some(dirs) = table
                 .get_mut(target.to.field)
                 .and_then(|value| value.as_array_mut())

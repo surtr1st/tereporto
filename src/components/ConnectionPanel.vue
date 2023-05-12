@@ -9,7 +9,8 @@ import ModalContent from './ModalContent.vue';
 import ModalFooter from './ModalFooter.vue';
 import { StorageResponse, TeleportResponse } from '../types';
 import { ref } from 'vue';
-import { removeQuotes } from '../helpers';
+import { removeQuotes, generateRandomHexColor } from '../helpers';
+import { useStorage, useTeleport } from '../server';
 
 interface IConnectionPanel {
   open?: boolean;
@@ -18,10 +19,44 @@ interface IConnectionPanel {
   teleports?: TeleportResponse[];
   storages?: StorageResponse[];
 }
-defineProps<IConnectionPanel>();
+const { onClose } = defineProps<IConnectionPanel>();
+
+const { updateTeleport } = useTeleport();
+const { updateStorage } = useStorage();
 
 const teleportIndex = ref<string>('');
 const storageIndex = ref<string>('');
+
+function connect() {
+  if (!teleportIndex.value || !storageIndex.value) return;
+  if (teleportIndex.value.length === 0 || storageIndex.value.length === 0)
+    return;
+
+  const color = generateRandomHexColor();
+
+  Promise.all([
+    updateTeleport({
+      filename: `${teleportIndex.value}.toml`,
+      target: { field: 'to', value: storageIndex.value },
+    }),
+    updateStorage({
+      filename: `${storageIndex.value}.toml`,
+      target: { field: 'constraint', value: teleportIndex.value },
+    }),
+  ])
+    .then(() => {
+      updateTeleport({
+        filename: `${teleportIndex.value}.toml`,
+        target: { field: 'color', value: color },
+      });
+      updateStorage({
+        filename: `${storageIndex.value}.toml`,
+        target: { field: 'color', value: color },
+      });
+      onClose!();
+    })
+    .catch((e) => console.log(e));
+}
 </script>
 
 <template>
@@ -80,6 +115,7 @@ const storageIndex = ref<string>('');
           label="Connect"
           rounded
           larger
+          @click="connect()"
         />
       </Flex>
     </ModalFooter>
