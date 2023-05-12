@@ -1,5 +1,6 @@
 pub mod base;
 pub mod hash_handler;
+pub mod helpers;
 pub mod storage;
 pub mod storage_cmd;
 pub mod teleport;
