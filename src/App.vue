@@ -1,57 +1,27 @@
 <script lang="ts">
-import { defineAsyncComponent, onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { StorageResponse, TeleportResponse } from './types';
 import { useStorage, useTeleport } from './server';
 import { removeQuotes } from './helpers';
 import ConnectionPanel from './components/ConnectionPanel.vue';
-const Button = defineAsyncComponent(() => import('./components/Button.vue'));
-const ButtonGroup = defineAsyncComponent(
-  () => import('./components/ButtonGroup.vue'),
-);
-const Checkbox = defineAsyncComponent(
-  () => import('./components/Checkbox.vue'),
-);
-const Descriptive = defineAsyncComponent(
-  () => import('./components/Descriptive.vue'),
-);
-const DirectoryChooser = defineAsyncComponent(
-  () => import('./components/DirectoryChooser.vue'),
-);
-const Flex = defineAsyncComponent(() => import('./components/Flex.vue'));
-const FunctionalPanel = defineAsyncComponent(
-  () => import('./components/FunctionalPanel.vue'),
-);
-const Grid = defineAsyncComponent(() => import('./components/Grid.vue'));
-const GridItem = defineAsyncComponent(
-  () => import('./components/GridItem.vue'),
-);
-const Idol = defineAsyncComponent(() => import('./components/Idol.vue'));
-const FolderTransferIcon = defineAsyncComponent(
-  () => import('./components/Icon/FolderTransferIcon.vue'),
-);
-const FolderDestinationIcon = defineAsyncComponent(
-  () => import('./components/Icon/FolderDestinationIcon.vue'),
-);
-const List = defineAsyncComponent(() => import('./components/List.vue'));
-const ListItem = defineAsyncComponent(
-  () => import('./components/ListItem.vue'),
-);
-const Modal = defineAsyncComponent(() => import('./components/Modal.vue'));
-const ModalFooter = defineAsyncComponent(
-  () => import('./components/ModalFooter.vue'),
-);
-const StoragePanel = defineAsyncComponent(
-  () => import('./components/StoragePanel.vue'),
-);
-const TeleportPanel = defineAsyncComponent(
-  () => import('./components/TeleportPanel.vue'),
-);
-const TitleHeader = defineAsyncComponent(
-  () => import('./components/TitleHeader.vue'),
-);
-const TrashIcon = defineAsyncComponent(
-  () => import('./components/Icon/TrashIcon.vue'),
-);
+import Button from './components/Button.vue';
+import ButtonGroup from './components/ButtonGroup.vue';
+import Descriptive from './components/Descriptive.vue';
+import StoragePanel from './components/StoragePanel.vue';
+import TeleportPanel from './components/TeleportPanel.vue';
+import GridItem from './components/GridItem.vue';
+import Grid from './components/Grid.vue';
+import Flex from './components/Flex.vue';
+import DirectoryChooser from './components/DirectoryChooser.vue';
+import ListItem from './components/ListItem.vue';
+import List from './components/List.vue';
+import Idol from './components/Idol.vue';
+import TitleHeader from './components/TitleHeader.vue';
+import FolderDestinationIcon from './components/Icon/FolderDestinationIcon.vue';
+import FolderTransferIcon from './components/Icon/FolderTransferIcon.vue';
+import TrashIcon from './components/Icon/TrashIcon.vue';
+import FunctionalPanel from './components/FunctionalPanel.vue';
+import Checkbox from './components/Checkbox.vue';
 </script>
 
 <script setup lang="ts">

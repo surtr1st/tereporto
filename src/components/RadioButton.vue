@@ -12,7 +12,7 @@ defineEmits(['update:selected']);
 
 <template>
   <label
-    :for="name"
+    :for="id"
     class="tp__radio"
   >
     {{ label }}
@@ -22,6 +22,7 @@ defineEmits(['update:selected']);
       :checked="checked"
       :name="name"
       :value="value"
+      @click="$emit('update:selected', value)"
     />
     <span class="tp__checkmark" />
   </label>

@@ -8,7 +8,7 @@ import Modal from './Modal.vue';
 import ModalContent from './ModalContent.vue';
 import ModalFooter from './ModalFooter.vue';
 import { StorageResponse, TeleportResponse } from '../types';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { removeQuotes } from '../helpers';
 
 interface IConnectionPanel {
@@ -22,11 +22,6 @@ defineProps<IConnectionPanel>();
 
 const teleportIndex = ref<string>('');
 const storageIndex = ref<string>('');
-
-onMounted(() => {
-  console.log(teleportIndex.value);
-  console.log(storageIndex.value);
-});
 </script>
 
 <template>
@@ -47,10 +42,10 @@ onMounted(() => {
               v-for="(teleport, index) in teleports"
               :key="index"
               :id="'teleport-radio-' + index"
-              :name="'teleport-radio-' + index"
+              name="teleport-radio"
               :label="removeQuotes(teleport.name)"
               :value="removeQuotes(teleport.index)"
-              v-model="teleportIndex"
+              v-model:selected="teleportIndex"
             />
           </Flex>
         </GridItem>
@@ -64,11 +59,11 @@ onMounted(() => {
               v-for="(storage, index) in storages"
               :key="index"
               :id="'storage-radio-' + index"
-              :name="'storage-radio-' + index"
+              name="storage-radio"
               :label="removeQuotes(storage.name)"
               :value="removeQuotes(storage.index)"
               :checked="removeQuotes(storage.index) === storageIndex"
-              v-model="storageIndex"
+              v-model:selected="storageIndex"
             />
           </Flex>
         </GridItem>

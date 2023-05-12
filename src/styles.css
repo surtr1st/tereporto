@@ -9,12 +9,12 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
   --darker-color: #222222;
-  --neutral-gray: #2C2C2C;
+  --neutral-gray: #2c2c2c;
   --light-neutral-gray: #343434;
   --lighter-neutral-gray: #424242;
   --darker-neutral-gray: #232323;
   --darker-neutral: #242424;
-  --danger-color: #FF8F8F;
+  --danger-color: #ff8f8f;
   --light-danger-color: #ffa7a7;
 }
 
@@ -49,38 +49,49 @@ svg {
   * @author jh3y
 */
 @-webkit-keyframes swap {
-  0%, 100% {
+  0%,
+  100% {
     -webkit-transform: scale(0);
-            transform: scale(0); }
+    transform: scale(0);
+  }
   50% {
     -webkit-transform: scale(1);
-            transform: scale(1); } }
+    transform: scale(1);
+  }
+}
 @keyframes swap {
-  0%, 100% {
+  0%,
+  100% {
     -webkit-transform: scale(0);
-            transform: scale(0); }
+    transform: scale(0);
+  }
   50% {
     -webkit-transform: scale(1);
-            transform: scale(1); } }
+    transform: scale(1);
+  }
+}
 
-.swap:after, .swap:before {
+.swap:after,
+.swap:before {
   border-radius: 100%;
   content: '';
   height: 50px;
-  opacity: .5;
+  opacity: 0.5;
   position: absolute;
-  width: 50px; }
+  width: 50px;
+}
 
 .swap:after {
   -webkit-animation: swap 1.5s -0.75s infinite;
-          animation: swap 1.5s -0.75s infinite;
-  background-color: var(--primary); }
+  animation: swap 1.5s -0.75s infinite;
+  background-color: var(--primary);
+}
 
 .swap:before {
   -webkit-animation: swap 1.5s infinite;
-          animation: swap 1.5s infinite;
-  background-color: var(--secondary); }
-
+  animation: swap 1.5s infinite;
+  background-color: var(--secondary);
+}
 
 @keyframes fade-in {
   from {
