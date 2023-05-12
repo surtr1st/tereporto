@@ -12,6 +12,7 @@ mod toml_handler;
 use base::{Base, DirectoryControl};
 use storage_cmd::{create_storage, get_storages, update_storage};
 use teleport_cmd::{create_teleport, get_teleports, update_teleport};
+use helpers::open_selected_directory;
 
 use tauri::{
     AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, RunEvent, SystemTray, SystemTrayEvent,
@@ -30,7 +31,8 @@ fn main() {
             update_storage,
             get_teleports,
             create_teleport,
-            update_teleport
+            update_teleport,
+            open_selected_directory
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")

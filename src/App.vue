@@ -22,6 +22,7 @@ import FolderTransferIcon from './components/Icon/FolderTransferIcon.vue';
 import TrashIcon from './components/Icon/TrashIcon.vue';
 import FunctionalPanel from './components/FunctionalPanel.vue';
 import Checkbox from './components/Checkbox.vue';
+import { useDirectoryControl } from './server/dir-control';
 </script>
 
 <script setup lang="ts">
@@ -32,6 +33,7 @@ const teleports = ref<TeleportResponse[] | undefined>([]);
 const storages = ref<StorageResponse[] | undefined>([]);
 const { getTeleports, createTeleport } = useTeleport();
 const { getStorages, createStorage } = useStorage();
+const { openSelectedDir } = useDirectoryControl();
 
 function retrieveTeleports() {
   getTeleports()
@@ -162,6 +164,7 @@ onMounted(() => {
               <Descriptive
                 :title="removeQuotes(storage.name)"
                 :description="removeQuotes(storage.directory)"
+                @action="openSelectedDir(removeQuotes(storage.directory))"
               />
               <Button
                 rounded

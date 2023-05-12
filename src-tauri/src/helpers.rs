@@ -54,3 +54,12 @@ pub fn has_connected(c: ConnectionBetween) -> bool {
 
     indexes[0] == indexes[1]
 }
+
+#[tauri::command]
+pub fn open_selected_directory(dir: &str) -> Result<(), String> {
+    println!("{}", dir);
+    match open::that(dir) {
+        Ok(status) => Ok(()),
+        Err(_) => Err(String::from("Cannot open selected directory!")) 
+    }
+}
