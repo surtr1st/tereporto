@@ -1,8 +1,8 @@
-use std::fs;
 use crate::base::{Base, DirectoryControl};
 use crate::hash_handler::HashHandler;
 use crate::storage::{NewStorage, Storage, StorageArgs};
 use crate::toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs};
+use std::fs;
 
 #[tauri::command]
 pub fn get_storages() -> Vec<Storage> {
@@ -12,9 +12,7 @@ pub fn get_storages() -> Vec<Storage> {
     let dir = Base::init_path().get_base_directory();
     for file in fs::read_dir(dir).unwrap() {
         let filename = file.unwrap().path().display().to_string();
-        let content = handler
-            .retrieve(&filename)
-            .read_content();
+        let content = handler.retrieve(&filename).read_content();
 
         let section = content.get("storage");
         if section.is_none() {
@@ -27,7 +25,7 @@ pub fn get_storages() -> Vec<Storage> {
                     name: s.get("name").unwrap().to_string(),
                     directory: s.get("directory").unwrap().to_string(),
                     constraint: s.get("constraint").is_none().then(|| String::from("")),
-                    color: s.get("color").is_none().then(|| String::from(""))
+                    color: s.get("color").is_none().then(|| String::from("")),
                 });
             }
         }
@@ -51,7 +49,7 @@ pub fn create_storage(s: StorageArgs) -> Result<String, String> {
             name: &s.name,
             directory: &s.directory,
             constraint: s.constraint,
-            color: s.color
+            color: s.color,
         }))
 }
 

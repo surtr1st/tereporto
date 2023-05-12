@@ -9,8 +9,8 @@ mod teleport_cmd;
 mod toml_handler;
 
 use base::{Base, DirectoryControl};
-use storage_cmd::{get_storages, create_storage, update_storage};
-use teleport_cmd::{get_teleports, create_teleport, update_teleport};
+use storage_cmd::{create_storage, get_storages, update_storage};
+use teleport_cmd::{create_teleport, get_teleports, update_teleport};
 
 use tauri::{
     AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, RunEvent, SystemTray, SystemTrayEvent,

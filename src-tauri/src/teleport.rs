@@ -39,7 +39,7 @@ impl Teleport {
                 name: t.name.to_string(),
                 directories: t.directories.to_vec(),
                 to: t.to,
-                color: t.color
+                color: t.color,
             },
         };
         toml::to_string_pretty(&teleport).unwrap()

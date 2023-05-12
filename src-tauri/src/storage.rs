@@ -39,7 +39,7 @@ impl Storage {
                 name: s.name.to_string(),
                 directory: s.directory.to_string(),
                 constraint: s.constraint,
-                color: s.color
+                color: s.color,
             },
         };
         toml::to_string_pretty(&storage).unwrap()

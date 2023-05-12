@@ -1,8 +1,8 @@
-use std::fs;
 use crate::base::{Base, DirectoryControl};
 use crate::hash_handler::HashHandler;
 use crate::teleport::{NewTeleport, Teleport, TeleportArgs};
 use crate::toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs};
+use std::fs;
 
 #[tauri::command]
 pub fn get_teleports() -> Vec<Teleport> {
@@ -12,9 +12,7 @@ pub fn get_teleports() -> Vec<Teleport> {
     let dir = Base::init_path().get_base_directory();
     for file in fs::read_dir(dir).unwrap() {
         let filename = file.unwrap().path().display().to_string();
-        let content = handler
-            .retrieve(&filename)
-            .read_content();
+        let content = handler.retrieve(&filename).read_content();
 
         let section = content.get("teleports");
         if section.is_none() {
@@ -25,14 +23,15 @@ pub fn get_teleports() -> Vec<Teleport> {
                 teleports.push(Teleport {
                     index: t.get("index").unwrap().to_string(),
                     name: t.get("name").unwrap().to_string(),
-                    directories: t.get("directories")
+                    directories: t
+                        .get("directories")
                         .unwrap()
                         .as_table()
                         .iter()
                         .map(|dir| dir.to_string())
                         .collect(),
                     to: t.get("to").is_none().then(|| String::from("")),
-                    color: t.get("color").is_none().then(|| String::from(""))
+                    color: t.get("color").is_none().then(|| String::from("")),
                 });
             }
         }
@@ -56,7 +55,7 @@ pub fn create_teleport(t: TeleportArgs) -> Result<String, String> {
             name: &t.name,
             directories: &t.directories,
             to: t.to,
-            color: t.color
+            color: t.color,
         }))
 }
 
