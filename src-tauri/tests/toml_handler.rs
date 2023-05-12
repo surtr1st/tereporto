@@ -174,7 +174,7 @@ mod toml_handler_on_modification {
                 &mut data,
                 TOMLUpdateArgs {
                     key: "teleports",
-                    from: MappedField {
+                    to: MappedField {
                         field: "directories",
                         value: "/a/du/dark/wa/123",
                     },

@@ -2,12 +2,14 @@ export type Teleport = {
   name: string;
   directories?: string[];
   to?: string;
+  color?: string;
 };
 
 export type Storage = {
   name: string;
   directory: string;
   constraint?: string;
+  color?: string;
 };
 
 export type Directory = string;
@@ -17,6 +19,7 @@ export type TeleportResponse = {
   name: string;
   directories: string[];
   to: string;
+  color: string;
 };
 
 export type StorageResponse = {
@@ -24,6 +27,7 @@ export type StorageResponse = {
   name: string;
   directory: string;
   constraint: string;
+  color: string;
 };
 
 export type MappedField = {

@@ -14,7 +14,11 @@ defineProps<IDescriptive>();
       class="tp__link"
       @click="onAction"
     >
-      "{{ description }}"
+      "{{
+        Array.isArray(description) && Array.of(description).length > 1
+          ? description.join('...')
+          : Array.of(description)[0]
+      }}"
     </p>
     <slot />
   </span>

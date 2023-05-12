@@ -1,22 +1,28 @@
 <script setup lang="ts">
 interface IRadio {
+  id?: string;
   name?: string;
   label?: string;
   checked?: boolean;
+  value?: string;
 }
 defineProps<IRadio>();
+defineEmits(['update:selected']);
 </script>
 
 <template>
   <label
-    :for="name"
+    :for="id"
     class="tp__radio"
   >
     {{ label }}
     <input
       type="radio"
+      :id="id"
       :checked="checked"
       :name="name"
+      :value="value"
+      @click="$emit('update:selected', value)"
     />
     <span class="tp__checkmark" />
   </label>
@@ -28,7 +34,7 @@ defineProps<IRadio>();
   display: block;
   position: relative;
   padding-left: 30px;
-  margin-top: 1px;
+  margin-top: 10px;
   cursor: pointer;
   font-size: 15px;
   -webkit-user-select: none;
@@ -36,6 +42,7 @@ defineProps<IRadio>();
   -ms-user-select: none;
   user-select: none;
   background: inherit;
+  color: white;
 }
 
 /* Hide the browser's default radio button */

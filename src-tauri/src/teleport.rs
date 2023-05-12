@@ -7,6 +7,7 @@ pub struct Teleport {
     pub name: String,
     pub directories: Vec<String>,
     pub to: Option<String>,
+    pub color: Option<String>,
 }
 
 #[derive(Debug, Default, serde::Serialize)]
@@ -19,6 +20,7 @@ pub struct TeleportArgs {
     pub name: String,
     pub directories: Vec<String>,
     pub to: Option<String>,
+    pub color: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -26,6 +28,7 @@ pub struct NewTeleport<'nt> {
     pub name: &'nt str,
     pub directories: &'nt Vec<String>,
     pub to: Option<String>,
+    pub color: Option<String>,
 }
 
 impl Teleport {
@@ -36,6 +39,7 @@ impl Teleport {
                 name: t.name.to_string(),
                 directories: t.directories.to_vec(),
                 to: t.to,
+                color: t.color,
             },
         };
         toml::to_string_pretty(&teleport).unwrap()

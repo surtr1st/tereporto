@@ -142,7 +142,7 @@ onUnmounted(() => {
   overflow-y: auto;
   overflow-x: hidden;
   border-radius: 10px;
-  padding: 0.2rem;
+  padding: 1rem;
 }
 
 .tp__modal-footer {
@@ -150,7 +150,10 @@ onUnmounted(() => {
   justify-content: center;
   gap: 3rem;
   align-items: center;
-  padding: 0.2rem;
+  height: 20vh;
+  max-height: 35vh;
+  padding: 1.2rem;
+  margin-top: 1rem;
   margin-bottom: 0.5rem;
   border-radius: 10px;
 }

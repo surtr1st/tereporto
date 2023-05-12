@@ -4,7 +4,7 @@ import { Storage, StorageResponse, StorageUpdateArgs } from '../types';
 export function useStorage() {
   const getStorages = async () => {
     try {
-      return await invoke<StorageResponse>('get_storages');
+      return await invoke<StorageResponse[]>('get_storages');
     } catch (e) {
       console.log(e);
     }
