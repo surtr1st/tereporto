@@ -31,14 +31,18 @@ impl DirectoryControl for Base {
     }
 
     fn create_recursive(&mut self, dir: &str) -> &mut Base {
-        if !Path::new(dir).is_dir() {
-            fs::create_dir(dir).unwrap();
+        let directory = format!("{}/{}", self.directory, dir);
+        if !Path::new(&directory).is_dir() {
+            fs::create_dir(directory).unwrap();
         }
         self
     }
 
     fn get_recursive(&mut self, dir: &str) -> &mut Base {
-        self.recursive = Some(dir.to_string());
+        let directory = format!("{}/{}", self.directory, dir);
+        if Path::new(&directory).is_dir() {
+            self.recursive = Some(dir.to_string());
+        }
         self
     }
 

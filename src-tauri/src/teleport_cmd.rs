@@ -54,6 +54,8 @@ pub fn create_teleport(t: TeleportArgs) -> Result<String, String> {
         .get_recursive(TELEPORT_ARCHIVE_FOLDER)
         .get_base_directory();
 
+    println!("{}", &dir);
+
     // Hashing and take this as filename
     let hasher = HashHandler::encrypt(&t.name);
 
