@@ -72,7 +72,7 @@ pub fn update_teleport(filename: String, target: MappedField) -> Result<String, 
         &mut content,
         TOMLUpdateArgs {
             key: "teleports",
-            from: MappedField {
+            to: MappedField {
                 field: target.field,
                 value: target.value,
             },

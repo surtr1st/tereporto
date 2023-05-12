@@ -67,7 +67,7 @@ pub fn update_storage(filename: String, target: MappedField) -> Result<String, S
         &mut content,
         TOMLUpdateArgs {
             key: "storage",
-            from: MappedField {
+            to: MappedField {
                 field: target.field,
                 value: target.value,
             },

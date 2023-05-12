@@ -14,7 +14,7 @@ pub struct MappedField<'mf> {
 #[derive(Debug, Default, Clone)]
 pub struct TOMLUpdateArgs<'tua> {
     pub key: &'tua str,
-    pub from: MappedField<'tua>,
+    pub to: MappedField<'tua>,
 }
 
 impl TOMLHandler {
@@ -75,10 +75,10 @@ impl TOMLHandler {
             .and_then(|value| value.as_table_mut())
         {
             if let Some(dirs) = table
-                .get_mut(target.from.field)
+                .get_mut(target.to.field)
                 .and_then(|value| value.as_array_mut())
             {
-                dirs.push(toml::Value::String(target.from.value.to_string()));
+                dirs.push(toml::Value::String(target.to.value.to_string()));
             }
         }
 
