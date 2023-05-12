@@ -23,24 +23,25 @@ import TrashIcon from './components/Icon/TrashIcon.vue';
 import FunctionalPanel from './components/FunctionalPanel.vue';
 import Checkbox from './components/Checkbox.vue';
 import { useDirectoryControl } from './server/dir-control';
+import Modal from './components/Modal.vue';
+import ModalContent from './components/ModalContent.vue';
 </script>
 
 <script setup lang="ts">
 const open = ref<boolean>(false);
+const openDirs = ref<boolean>(false);
 const teleport = ref<string | string[]>('');
 const storage = ref<string | string[]>('');
 const teleports = ref<TeleportResponse[] | undefined>([]);
 const storages = ref<StorageResponse[] | undefined>([]);
+const teleportDirs = ref<{ index: string; dirs: string[] }[]>([]);
 const { getTeleports, createTeleport } = useTeleport();
 const { getStorages, createStorage } = useStorage();
 const { openSelectedDir } = useDirectoryControl();
 
 function retrieveTeleports() {
   getTeleports()
-    .then((res) => {
-      console.log(res);
-      teleports.value = res;
-    })
+    .then((res) => (teleports.value = res))
     .catch((e) => console.log(e));
 }
 
@@ -75,6 +76,15 @@ function createNewStorage() {
       .then((rs) => console.log(rs))
       .catch((e) => console.log(e)),
   );
+}
+
+function handleSelectedDirs(index: string) {
+  console.log(teleports.value);
+  const selected = teleports.value
+    ?.filter((t) => t.index === index)
+    .map((v) => v.directories);
+  console.log(selected);
+  openDirs.value = true;
 }
 
 watch(teleport, (newTeleport, _oldTeleport) => {
@@ -135,6 +145,13 @@ onMounted(() => {
               <Descriptive
                 :title="removeQuotes(teleport.name)"
                 :description="teleport.directories"
+                @action="
+                  teleport.directories.length === 1
+                    ? handleSelectedDirs(teleport.index)
+                    : openSelectedDir(
+                        removeQuotes(teleport.directories.join('')),
+                      )
+                "
               />
               <Button
                 rounded
@@ -212,6 +229,17 @@ onMounted(() => {
       </Flex>
     </GridItem>
   </Grid>
+  <Modal
+    :open="openDirs"
+    title="Directories"
+    @close="openDirs = false"
+  >
+    <ModalContent>
+      <Flex>
+        <Descriptive description="dir.dirs" />
+      </Flex>
+    </ModalContent>
+  </Modal>
   <ConnectionPanel
     :open="open"
     title="Connection Panel"

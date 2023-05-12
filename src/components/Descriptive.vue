@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { removeQuotes } from '../helpers';
 interface IDescriptive {
   title?: string;
   description?: string | string[];
@@ -17,7 +18,7 @@ defineProps<IDescriptive>();
       "{{
         Array.isArray(description) && Array.of(description).length > 1
           ? description.join('...')
-          : Array.of(description)[0]
+          : removeQuotes(Array.of(description).join(''))
       }}"
     </p>
     <slot />
@@ -39,6 +40,10 @@ defineProps<IDescriptive>();
   color: #884452;
   font-size: 13px;
   background: inherit;
+}
+
+.tp__descriptive > p:hover {
+  cursor: pointer;
 }
 .tp__link {
   background: inherit;

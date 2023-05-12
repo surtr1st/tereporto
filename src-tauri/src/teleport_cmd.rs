@@ -32,9 +32,10 @@ pub fn get_teleports() -> Vec<Teleport> {
                     directories: t
                         .get("directories")
                         .unwrap()
-                        .as_table()
+                        .as_array()
+                        .unwrap()
                         .iter()
-                        .map(|dir| dir.to_string())
+                        .map(|v| v.to_string())
                         .collect(),
                     to: t.get("to").map(|value| value.to_string()),
                     color: t.get("color").map(|value| value.to_string()),
