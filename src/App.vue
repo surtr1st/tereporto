@@ -2,6 +2,8 @@
 import { defineAsyncComponent, onMounted, ref, watch } from 'vue';
 import { StorageResponse, TeleportResponse } from './types';
 import { useStorage, useTeleport } from './server';
+import { removeQuotes } from './helpers';
+import ConnectionPanel from './components/ConnectionPanel.vue';
 const Button = defineAsyncComponent(() => import('./components/Button.vue'));
 const ButtonGroup = defineAsyncComponent(
   () => import('./components/ButtonGroup.vue'),
@@ -61,8 +63,6 @@ const storages = ref<StorageResponse[] | undefined>([]);
 const { getTeleports, createTeleport } = useTeleport();
 const { getStorages, createStorage } = useStorage();
 
-const removeQuotes = (target: string) => target.replaceAll('"', '');
-
 function retrieveTeleports() {
   getTeleports()
     .then((res) => (teleports.value = res))
@@ -121,7 +121,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Grid>
+  <Grid type="default">
     <GridItem position="lheader">
       <Flex
         justify-content="center"
@@ -234,18 +234,11 @@ onMounted(() => {
       </Flex>
     </GridItem>
   </Grid>
-  <Modal
+  <ConnectionPanel
     :open="open"
-    title="Test"
+    title="Connection Panel"
+    :teleports="teleports"
+    :storages="storages"
     @close="open = false"
-  >
-    <ModalFooter>
-      <Button
-        label="Test"
-        color="darker"
-        rounded
-        larger
-      />
-    </ModalFooter>
-  </Modal>
+  />
 </template>
