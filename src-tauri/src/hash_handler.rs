@@ -1,3 +1,4 @@
+#![allow(dead_code, unused)]
 use hex;
 use sha2::{Digest, Sha256};
 
@@ -9,7 +10,7 @@ impl HashHandler {
         hex::encode(hash)
     }
 
-    pub fn _compare(target: &str, original: &str) -> bool {
+    pub fn compare(target: &str, original: &str) -> bool {
         let from_hashed = hex::decode(target).unwrap();
         let from_original = Sha256::new().chain_update(original).finalize();
         from_original.as_slice() == from_hashed

@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod base;
 mod hash_handler;
+mod helpers;
 mod storage;
 mod storage_cmd;
 mod teleport;

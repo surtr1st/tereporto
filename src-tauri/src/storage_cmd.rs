@@ -1,5 +1,6 @@
 use crate::base::{Base, DirectoryControl};
 use crate::hash_handler::HashHandler;
+use crate::helpers::STORAGE_ARCHIVE_FOLDER;
 use crate::storage::{NewStorage, Storage, StorageArgs};
 use crate::toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs};
 use std::fs;
@@ -9,7 +10,10 @@ pub fn get_storages() -> Vec<Storage> {
     let mut handler = TOMLHandler::default();
     let mut storages = vec![];
 
-    let dir = Base::init_path().get_base_directory();
+    let dir = Base::init_path()
+        .get_recursive(STORAGE_ARCHIVE_FOLDER)
+        .get_base_directory();
+
     for file in fs::read_dir(dir).unwrap() {
         let filename = file.unwrap().path().display().to_string();
         let content = handler.retrieve(&filename).read_content();
@@ -38,7 +42,11 @@ pub fn get_storages() -> Vec<Storage> {
 pub fn create_storage(s: StorageArgs) -> Result<String, String> {
     let mut handler = TOMLHandler::default();
 
-    let dir = Base::init_path().get_base_directory();
+    let mut base = Base::init_path();
+    let dir = base
+        .create_recursive(STORAGE_ARCHIVE_FOLDER)
+        .get_recursive(STORAGE_ARCHIVE_FOLDER)
+        .get_base_directory();
 
     // Hashing and take this as filename
     let hasher = HashHandler::encrypt(&s.name);
@@ -56,7 +64,9 @@ pub fn create_storage(s: StorageArgs) -> Result<String, String> {
 #[tauri::command]
 pub fn update_storage(filename: String, target: MappedField) -> Result<String, String> {
     let mut handler = TOMLHandler::default();
-    let dir = Base::init_path().get_base_directory();
+    let dir = Base::init_path()
+        .get_recursive(STORAGE_ARCHIVE_FOLDER)
+        .get_base_directory();
     let file = format!("{}/{}", &dir, &filename);
 
     let mut content = handler.retrieve(&file).read_content();
