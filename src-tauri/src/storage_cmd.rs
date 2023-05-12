@@ -15,21 +15,23 @@ pub fn get_storages() -> Vec<Storage> {
         .get_base_directory();
 
     for file in fs::read_dir(dir).unwrap() {
-        let filename = file.unwrap().path().display().to_string();
+        let entry = file.unwrap();
+        let filename = entry.path().display().to_string();
         let content = handler.retrieve(&filename).read_content();
 
         let section = content.get("storage");
         if section.is_none() {
             continue;
         }
+
         if let Some(storage) = section {
             if let Some(s) = storage.as_table() {
                 storages.push(Storage {
                     index: s.get("index").unwrap().to_string(),
                     name: s.get("name").unwrap().to_string(),
                     directory: s.get("directory").unwrap().to_string(),
-                    constraint: s.get("constraint").is_none().then(|| String::from("")),
-                    color: s.get("color").is_none().then(|| String::from("")),
+                    constraint: s.get("constraint").map(|value| value.to_string()),
+                    color: s.get("color").map(|value| value.to_string()),
                 });
             }
         }

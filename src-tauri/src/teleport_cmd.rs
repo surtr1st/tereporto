@@ -15,13 +15,15 @@ pub fn get_teleports() -> Vec<Teleport> {
         .get_base_directory();
 
     for file in fs::read_dir(dir).unwrap() {
-        let filename = file.unwrap().path().display().to_string();
+        let entry = file.unwrap();
+        let filename = entry.path().display().to_string();
         let content = handler.retrieve(&filename).read_content();
 
         let section = content.get("teleports");
         if section.is_none() {
             continue;
         }
+
         if let Some(teleport) = section {
             if let Some(t) = teleport.as_table() {
                 teleports.push(Teleport {
@@ -34,8 +36,8 @@ pub fn get_teleports() -> Vec<Teleport> {
                         .iter()
                         .map(|dir| dir.to_string())
                         .collect(),
-                    to: t.get("to").is_none().then(|| String::from("")),
-                    color: t.get("color").is_none().then(|| String::from("")),
+                    to: t.get("to").map(|value| value.to_string()),
+                    color: t.get("color").map(|value| value.to_string()),
                 });
             }
         }
@@ -53,8 +55,6 @@ pub fn create_teleport(t: TeleportArgs) -> Result<String, String> {
         .create_recursive(TELEPORT_ARCHIVE_FOLDER)
         .get_recursive(TELEPORT_ARCHIVE_FOLDER)
         .get_base_directory();
-
-    println!("{}", &dir);
 
     // Hashing and take this as filename
     let hasher = HashHandler::encrypt(&t.name);

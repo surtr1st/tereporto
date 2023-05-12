@@ -35,7 +35,10 @@ const { getStorages, createStorage } = useStorage();
 
 function retrieveTeleports() {
   getTeleports()
-    .then((res) => (teleports.value = res))
+    .then((res) => {
+      console.log(res);
+      teleports.value = res;
+    })
     .catch((e) => console.log(e));
 }
 
@@ -122,6 +125,7 @@ onMounted(() => {
               v-for="(teleport, index) in teleports"
               :id="teleport.index"
               :key="teleport.index"
+              :color="removeQuotes(teleport.color ?? '')"
             >
               <Idol>
                 <FolderTransferIcon />
@@ -150,6 +154,7 @@ onMounted(() => {
               v-for="(storage, index) in storages"
               :id="storage.index"
               :key="storage.index"
+              :color="removeQuotes(storage.color ?? '')"
             >
               <Idol>
                 <FolderDestinationIcon />

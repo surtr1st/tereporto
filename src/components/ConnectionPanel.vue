@@ -43,16 +43,16 @@ function connect() {
       filename: `${storageIndex.value}.toml`,
       target: { field: 'constraint', value: teleportIndex.value },
     }),
+    updateTeleport({
+      filename: `${teleportIndex.value}.toml`,
+      target: { field: 'color', value: color },
+    }),
+    updateStorage({
+      filename: `${storageIndex.value}.toml`,
+      target: { field: 'color', value: color },
+    }),
   ])
     .then(() => {
-      updateTeleport({
-        filename: `${teleportIndex.value}.toml`,
-        target: { field: 'color', value: color },
-      });
-      updateStorage({
-        filename: `${storageIndex.value}.toml`,
-        target: { field: 'color', value: color },
-      });
       onClose!();
     })
     .catch((e) => console.log(e));
@@ -97,7 +97,7 @@ function connect() {
               name="storage-radio"
               :label="removeQuotes(storage.name)"
               :value="removeQuotes(storage.index)"
-              :checked="removeQuotes(storage.index) === storageIndex"
+              :checked="removeQuotes(storage.index) === storage.index"
               v-model:selected="storageIndex"
             />
           </Flex>

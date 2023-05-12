@@ -5,8 +5,8 @@ use crate::{
     toml_handler::TOMLHandler,
 };
 
-pub const TELEPORT_ARCHIVE_FOLDER: &str = ".teleports";
-pub const STORAGE_ARCHIVE_FOLDER: &str = ".storages";
+pub const TELEPORT_ARCHIVE_FOLDER: &str = "teleports";
+pub const STORAGE_ARCHIVE_FOLDER: &str = "storages";
 
 pub struct ConnectionBetween<'cb> {
     pub teleport: &'cb str,
@@ -22,14 +22,14 @@ pub fn has_connected(c: ConnectionBetween) -> bool {
     );
 
     let first_file = format!(
-        "{}/{}.toml",
+        "{}/{}",
         Base::init_path()
             .get_recursive(TELEPORT_ARCHIVE_FOLDER)
             .get_base_directory(),
         filename_encrypted.0
     );
     let second_file = format!(
-        "{}/{}.toml",
+        "{}/{}",
         Base::init_path()
             .get_recursive(STORAGE_ARCHIVE_FOLDER)
             .get_base_directory(),
