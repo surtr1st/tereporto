@@ -1,13 +1,14 @@
 {
   "name": "tereporto",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "fmt": "npx prettier --write src"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",
