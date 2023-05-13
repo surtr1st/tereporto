@@ -36,7 +36,6 @@ pub fn get_storages() -> Vec<Storage> {
                 });
             }
         }
-        println!("FROM STORAGE CMD: {}", &filename);
     }
 
     storages
@@ -106,7 +105,7 @@ pub fn remove_storage(filename: String) -> Result<String, String> {
         if let Some(teleport) = section {
             if let Some(t) = teleport.as_table() {
                 let constraint = t.get("to").unwrap().to_string();
-                if &constraint == &filename {
+                if *constraint == *filename {
                     handler.update(
                         &mut content,
                         TOMLUpdateArgs {

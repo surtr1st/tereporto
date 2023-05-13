@@ -43,7 +43,6 @@ pub fn get_teleports() -> Vec<Teleport> {
                 });
             }
         }
-        println!("FROM TELEPORT CMD: {}", &filename);
     }
 
     teleports
@@ -113,7 +112,7 @@ pub fn remove_teleport(filename: String) -> Result<String, String> {
         if let Some(storage) = section {
             if let Some(s) = storage.as_table() {
                 let constraint = s.get("constraint").unwrap().to_string();
-                if &constraint == &filename {
+                if *constraint == *filename {
                     handler.update(
                         &mut content,
                         TOMLUpdateArgs {

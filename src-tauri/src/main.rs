@@ -13,12 +13,8 @@ mod toml_handler;
 use base::{Base, DirectoryControl};
 use crossbeam_channel::unbounded;
 use event_watcher::watch;
-use helpers::STORAGE_ARCHIVE_FOLDER;
 use helpers::{open_selected_directory, remove_quotes};
 use notify::*;
-use storage::Storage;
-use toml_handler::TOMLHandler;
-use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -43,8 +39,7 @@ fn main() {
             tauri::async_runtime::spawn(async move {
                 loop {
                     let connection = receive_connection();
-                    println!("{:#?}", &connection);
-                    if connection.len() > 0 {
+                    if !connection.is_empty() {
                         std::thread::sleep(std::time::Duration::from_secs(2));
                         // Create a file system watcher
                         let watcher_config = Config::default()
@@ -142,7 +137,7 @@ fn receive_connection() -> Vec<TeleportTarget> {
     let connected_teleports = Teleport::get_connected();
     let storages = get_storages();
 
-    if connected_teleports.len() == 0 {
+    if connected_teleports.is_empty() {
         return connection;
     }
 
