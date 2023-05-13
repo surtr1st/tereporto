@@ -20,10 +20,6 @@ pub fn get_teleports() -> Vec<Teleport> {
         let content = handler.retrieve(&filename).read_content();
 
         let section = content.get("teleports");
-        if section.is_none() {
-            continue;
-        }
-
         if let Some(teleport) = section {
             if let Some(t) = teleport.as_table() {
                 teleports.push(Teleport {

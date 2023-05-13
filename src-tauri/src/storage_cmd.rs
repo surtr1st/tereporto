@@ -20,10 +20,6 @@ pub fn get_storages() -> Vec<Storage> {
         let content = handler.retrieve(&filename).read_content();
 
         let section = content.get("storage");
-        if section.is_none() {
-            continue;
-        }
-
         if let Some(storage) = section {
             if let Some(s) = storage.as_table() {
                 storages.push(Storage {
