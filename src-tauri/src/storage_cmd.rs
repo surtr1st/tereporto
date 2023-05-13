@@ -1,6 +1,6 @@
 use crate::base::{Base, DirectoryControl};
 use crate::hash_handler::HashHandler;
-use crate::helpers::STORAGE_ARCHIVE_FOLDER;
+use crate::helpers::{STORAGE_ARCHIVE_FOLDER, TELEPORT_ARCHIVE_FOLDER};
 use crate::storage::{NewStorage, Storage, StorageArgs};
 use crate::toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs};
 use std::fs;
@@ -84,9 +84,57 @@ pub fn update_storage(filename: String, target: MappedField) -> Result<String, S
 
 #[tauri::command]
 pub fn remove_storage(filename: String) -> Result<String, String> {
+    let mut handler = TOMLHandler::default();
+    let teleport_path = Base::init_path()
+        .get_recursive(TELEPORT_ARCHIVE_FOLDER)
+        .get_base_directory();
     let dir = Base::init_path()
         .get_recursive(STORAGE_ARCHIVE_FOLDER)
-        .get_base_directory();
+        .get_base_directory(); 
+
     let file = format!("{}/{}", &dir, &filename);
-    TOMLHandler::default().remove(&file)
+
+    let mut teleport_dirs = vec![];
+    for t_file in fs::read_dir(&dir).unwrap() {
+        let entry = t_file.unwrap();
+        let filename = entry.path().display().to_string();
+        let content = handler.retrieve(&filename).read_content();
+
+        let section = content.get("teleports");
+        if let Some(teleport) = section {
+            if let Some(t) = teleport.as_table() {
+                teleport_dirs = t.get("directories")
+                    .unwrap()
+                    .as_array()
+                    .unwrap()
+                    .to_vec();
+            }
+        }
+    }
+
+    let mut content = handler.retrieve(&file).read_content();
+    if teleport_dirs.len() >= 1 {
+        handler.update(
+            &mut content,
+            TOMLUpdateArgs {
+                key: "teleports",
+                to: MappedField {
+                    field: "to",
+                    value: ""
+                }
+            }
+        )?;
+        handler.update(
+            &mut content,
+            TOMLUpdateArgs {
+                key: "teleports",
+                to: MappedField {
+                    field: "color",
+                    value: ""
+                }
+            }
+        )?;
+    }
+
+    handler.remove(&file)
 }

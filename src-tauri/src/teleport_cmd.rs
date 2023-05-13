@@ -90,9 +90,42 @@ pub fn update_teleport(filename: String, target: MappedField) -> Result<String, 
 
 #[tauri::command]
 pub fn remove_teleport(filename: String) -> Result<String, String> {
+    let mut handler = TOMLHandler::default();
     let dir = Base::init_path()
         .get_recursive(TELEPORT_ARCHIVE_FOLDER)
         .get_base_directory();
+
+    let mut teleport_dirs = vec![];
+    for t_file in fs::read_dir(&dir).unwrap() {
+        let entry = t_file.unwrap();
+        let filename = entry.path().display().to_string();
+        let content = handler.retrieve(&filename).read_content();
+
+        let section = content.get("teleports");
+        if let Some(teleport) = section {
+            if let Some(t) = teleport.as_table() {
+                teleport_dirs = t.get("directories")
+                    .unwrap()
+                    .as_array()
+                    .unwrap()
+                    .to_vec();
+            }
+        }
+    }
+
     let file = format!("{}/{}", &dir, &filename);
-    TOMLHandler::default().remove(&file)
+    let mut content = handler.retrieve(&file).read_content();
+    if teleport_dirs.len() == 0 {
+        handler.remove(&file)?;
+    }
+    handler.update(
+        &mut content,
+        TOMLUpdateArgs {
+            key: "teleports",
+            to: MappedField {
+                field: "directories",
+                value: ""
+            }
+        }
+    )
 }
