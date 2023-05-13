@@ -1,6 +1,6 @@
 [package]
 name = "tereporto"
-version = "0.2.0"
+version = "0.3.5"
 description = "A Tauri App"
 authors = ["you"]
 license = ""
@@ -28,6 +28,10 @@ env_logger = "0.10.0"
 tokio = { version = "1.28.0", features = ["full"] }
 clap = { version = "4.2.7", features = ["derive"] }
 open = "4.1.0"
+rayon = "1.7.0"
+notify = "5.1.0"
+regex = "1.8.1"
+crossbeam-channel = "0.5.8"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

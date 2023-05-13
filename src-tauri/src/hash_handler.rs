@@ -1,5 +1,4 @@
 #![allow(dead_code, unused)]
-use hex;
 use sha2::{Digest, Sha256};
 
 pub struct HashHandler;

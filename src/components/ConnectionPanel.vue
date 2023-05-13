@@ -11,6 +11,7 @@ import { StorageResponse, TeleportResponse } from '../types';
 import { ref } from 'vue';
 import { removeQuotes, generateRandomHexColor } from '../helpers';
 import { useStorage, useTeleport } from '../server';
+import { refresh } from '../globals';
 
 interface IConnectionPanel {
   open?: boolean;
@@ -54,6 +55,7 @@ function connect() {
   ])
     .then(() => {
       onClose!();
+      refresh.fetch = !refresh.fetch;
     })
     .catch((e) => console.log(e));
 }

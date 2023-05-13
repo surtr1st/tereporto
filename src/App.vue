@@ -25,6 +25,7 @@ import Checkbox from './components/Checkbox.vue';
 import { useDirectoryControl } from './server/dir-control';
 import Modal from './components/Modal.vue';
 import ModalContent from './components/ModalContent.vue';
+import { refresh } from './globals';
 </script>
 
 <script setup lang="ts">
@@ -35,8 +36,8 @@ const storage = ref<string | string[]>('');
 const teleports = ref<TeleportResponse[] | undefined>([]);
 const storages = ref<StorageResponse[] | undefined>([]);
 const teleportDirs = ref<{ index: string; dirs: string[] }[]>([]);
-const { getTeleports, createTeleport } = useTeleport();
-const { getStorages, createStorage } = useStorage();
+const { getTeleports, createTeleport, removeTeleport } = useTeleport();
+const { getStorages, createStorage, removeStorage } = useStorage();
 const { openSelectedDir } = useDirectoryControl();
 
 function retrieveTeleports() {
@@ -99,6 +100,14 @@ watch(storage, (newStorage, _oldStorage) => {
   retrieveStorages();
 });
 
+watch(
+  () => refresh.fetch,
+  () => {
+    retrieveTeleports();
+    retrieveStorages();
+  },
+);
+
 onMounted(() => {
   retrieveTeleports();
   retrieveStorages();
@@ -157,6 +166,7 @@ onMounted(() => {
                 rounded
                 :name="'teleport-trash-btn-' + index"
                 color="danger"
+                @click="removeTeleport(removeQuotes(teleport.index))"
               >
                 <TrashIcon />
               </Button>
@@ -187,6 +197,7 @@ onMounted(() => {
                 rounded
                 :name="'storage-trash-btn-' + index"
                 color="danger"
+                @click="removeStorage(removeQuotes(storage.index))"
               >
                 <TrashIcon />
               </Button>

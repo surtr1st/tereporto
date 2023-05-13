@@ -1,6 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod base;
+mod event_watcher;
 mod hash_handler;
 mod helpers;
 mod storage;
@@ -10,9 +11,17 @@ mod teleport_cmd;
 mod toml_handler;
 
 use base::{Base, DirectoryControl};
-use storage_cmd::{create_storage, get_storages, update_storage};
-use teleport_cmd::{create_teleport, get_teleports, update_teleport};
-use helpers::open_selected_directory;
+use crossbeam_channel::unbounded;
+use event_watcher::watch;
+use helpers::{open_selected_directory, remove_quotes};
+use notify::*;
+use std::path::PathBuf;
+use std::sync::Arc;
+use std::sync::Mutex;
+use std::time::Duration;
+use storage_cmd::{create_storage, get_storages, remove_storage, update_storage};
+use teleport::{Teleport, TeleportTarget};
+use teleport_cmd::{create_teleport, get_teleports, remove_teleport, update_teleport};
 
 use tauri::{
     AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, RunEvent, SystemTray, SystemTrayEvent,
@@ -21,7 +30,49 @@ use tauri::{
 
 fn main() {
     Base::init_path();
+    // Create a channel to receive events
+    let (tx, rx) = unbounded();
+    let rx_arc = Arc::new(Mutex::new(rx));
+
     tauri::Builder::default()
+        .setup(|_| {
+            tauri::async_runtime::spawn(async move {
+                loop {
+                    let connection = receive_connection();
+                    if !connection.is_empty() {
+                        std::thread::sleep(std::time::Duration::from_secs(2));
+                        // Create a file system watcher
+                        let watcher_config = Config::default()
+                            .with_poll_interval(Duration::from_secs(2))
+                            .with_compare_contents(true);
+
+                        let mut watcher: RecommendedWatcher =
+                            Watcher::new(tx.clone(), watcher_config).unwrap();
+
+                        // Start watching the folder for events
+                        for c in connection {
+                            println!("{}", &c.target);
+                            watcher
+                                .watch(
+                                    &PathBuf::from(remove_quotes(&c.target)),
+                                    RecursiveMode::Recursive,
+                                )
+                                .unwrap();
+
+                            println!("Monitoring folder for file additions: {}", &c.target);
+                            watch(
+                                Arc::clone(&rx_arc),
+                                &remove_quotes(&c.target),
+                                &remove_quotes(&c.destination),
+                            );
+                        }
+                    }
+                    // Delay or sleep for a certain period before the next iteration
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+                }
+            });
+            Ok(())
+        })
         .system_tray(create_system_tray())
         .on_system_tray_event(handle_system_tray)
         .on_window_event(prevent_frontend_on_close)
@@ -32,7 +83,9 @@ fn main() {
             get_teleports,
             create_teleport,
             update_teleport,
-            open_selected_directory
+            open_selected_directory,
+            remove_teleport,
+            remove_storage
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
@@ -76,4 +129,29 @@ fn prevent_backend_on_close(_app: &AppHandle, event: RunEvent) {
     if let RunEvent::ExitRequested { api, .. } = event {
         api.prevent_exit();
     }
+}
+
+fn receive_connection() -> Vec<TeleportTarget> {
+    let mut connection = vec![];
+
+    let connected_teleports = Teleport::get_connected();
+    let storages = get_storages();
+
+    if connected_teleports.is_empty() {
+        return connection;
+    }
+
+    // Check if connected
+    for t in &connected_teleports {
+        for s in &storages {
+            if t.current_connect == s.index {
+                connection.push(TeleportTarget {
+                    target: t.directory.clone(),
+                    destination: s.directory.clone(),
+                })
+            }
+        }
+    }
+
+    connection
 }
