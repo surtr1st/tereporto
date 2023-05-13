@@ -80,3 +80,13 @@ pub fn update_storage(filename: String, target: MappedField) -> Result<String, S
         },
     )
 }
+
+
+#[tauri::command]
+pub fn remove_storage(filename: String) -> Result<String, String> {
+    let dir = Base::init_path()
+        .get_recursive(STORAGE_ARCHIVE_FOLDER)
+        .get_base_directory();
+    let file = format!("{}/{}", &dir, &filename);
+    TOMLHandler::default().remove(&file)
+}

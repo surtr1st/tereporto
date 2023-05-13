@@ -28,9 +28,19 @@ export function useTeleport() {
     }
   };
 
+  const removeTeleport = async (filename: string) => {
+    try {
+      const result = await invoke<string>('remove_teleport', { filename });
+      console.log(result);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return {
     getTeleports,
     createTeleport,
     updateTeleport,
+    removeTeleport,
   };
 }

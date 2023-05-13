@@ -87,3 +87,12 @@ pub fn update_teleport(filename: String, target: MappedField) -> Result<String, 
         },
     )
 }
+
+#[tauri::command]
+pub fn remove_teleport(filename: String) -> Result<String, String> {
+    let dir = Base::init_path()
+        .get_recursive(TELEPORT_ARCHIVE_FOLDER)
+        .get_base_directory();
+    let file = format!("{}/{}", &dir, &filename);
+    TOMLHandler::default().remove(&file)
+}

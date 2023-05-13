@@ -18,9 +18,9 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 use std::sync::{mpsc::channel, Arc};
 use std::time::Duration;
-use storage_cmd::{create_storage, get_storages, update_storage};
+use storage_cmd::{create_storage, get_storages, update_storage, remove_storage};
 use teleport::{Teleport, TeleportTarget};
-use teleport_cmd::{create_teleport, get_teleports, update_teleport};
+use teleport_cmd::{create_teleport, get_teleports, update_teleport, remove_teleport};
 
 use tauri::{
     AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, RunEvent, SystemTray, SystemTrayEvent,
@@ -59,7 +59,9 @@ fn main() {
             get_teleports,
             create_teleport,
             update_teleport,
-            open_selected_directory
+            open_selected_directory,
+            remove_teleport,
+            remove_storage
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")

@@ -35,8 +35,8 @@ const storage = ref<string | string[]>('');
 const teleports = ref<TeleportResponse[] | undefined>([]);
 const storages = ref<StorageResponse[] | undefined>([]);
 const teleportDirs = ref<{ index: string; dirs: string[] }[]>([]);
-const { getTeleports, createTeleport } = useTeleport();
-const { getStorages, createStorage } = useStorage();
+const { getTeleports, createTeleport, removeTeleport } = useTeleport();
+const { getStorages, createStorage, removeStorage } = useStorage();
 const { openSelectedDir } = useDirectoryControl();
 
 function retrieveTeleports() {
@@ -157,6 +157,7 @@ onMounted(() => {
                 rounded
                 :name="'teleport-trash-btn-' + index"
                 color="danger"
+                @click="removeTeleport(`${teleport.index}.toml`)"
               >
                 <TrashIcon />
               </Button>
@@ -187,6 +188,7 @@ onMounted(() => {
                 rounded
                 :name="'storage-trash-btn-' + index"
                 color="danger"
+                @click="removeStorage(`${storage.index}.toml`)"
               >
                 <TrashIcon />
               </Button>

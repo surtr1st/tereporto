@@ -101,4 +101,11 @@ impl TOMLHandler {
         // Write the updated TOML back to the file
         self.compose(&data)
     }
+
+    pub fn remove(&mut self, filename: &str) -> Result<String, String> {
+        match fs::remove_file(filename) {
+            Ok(_) => Ok(format!("Removed: {}", filename)),
+            Err(_) => panic!("Cannot remove: {}", filename)
+        }
+    }
 }
