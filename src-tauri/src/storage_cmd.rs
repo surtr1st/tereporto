@@ -14,9 +14,14 @@ pub fn get_storages() -> Vec<Storage> {
         .get_recursive(STORAGE_ARCHIVE_FOLDER)
         .get_base_directory();
 
-    for file in fs::read_dir(dir).unwrap() {
-        let entry = file.unwrap();
-        let filename = entry.path().display().to_string();
+    let entries: Vec<_> = fs::read_dir(dir)
+        .unwrap()
+        .filter_map(Result::ok)
+        .filter(|entry| entry.file_type().map(|ft| ft.is_file()).unwrap_or(false))
+        .collect();
+
+    for file in entries {
+        let filename = file.path().display().to_string();
         let content = handler.retrieve(&filename).read_content();
 
         let section = content.get("storage");
@@ -31,6 +36,7 @@ pub fn get_storages() -> Vec<Storage> {
                 });
             }
         }
+        println!("FROM STORAGE CMD: {}", &filename);
     }
 
     storages
@@ -81,7 +87,6 @@ pub fn update_storage(filename: String, target: MappedField) -> Result<String, S
     )
 }
 
-
 #[tauri::command]
 pub fn remove_storage(filename: String) -> Result<String, String> {
     let mut handler = TOMLHandler::default();
@@ -90,7 +95,7 @@ pub fn remove_storage(filename: String) -> Result<String, String> {
         .get_base_directory();
     let dir = Base::init_path()
         .get_recursive(STORAGE_ARCHIVE_FOLDER)
-        .get_base_directory(); 
+        .get_base_directory();
 
     for file in fs::read_dir(&teleport_dir).unwrap() {
         let entry = file.unwrap();
@@ -108,9 +113,9 @@ pub fn remove_storage(filename: String) -> Result<String, String> {
                             key: "teleports",
                             to: MappedField {
                                 field: "to",
-                                value: ""
-                            }
-                        }
+                                value: "",
+                            },
+                        },
                     )?;
                     handler.update(
                         &mut content,
@@ -118,9 +123,9 @@ pub fn remove_storage(filename: String) -> Result<String, String> {
                             key: "teleports",
                             to: MappedField {
                                 field: "color",
-                                value: ""
-                            }
-                        }
+                                value: "",
+                            },
+                        },
                     )?;
                 }
             }

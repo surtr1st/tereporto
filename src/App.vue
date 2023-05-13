@@ -25,6 +25,7 @@ import Checkbox from './components/Checkbox.vue';
 import { useDirectoryControl } from './server/dir-control';
 import Modal from './components/Modal.vue';
 import ModalContent from './components/ModalContent.vue';
+import { refresh } from './globals';
 </script>
 
 <script setup lang="ts">
@@ -98,6 +99,14 @@ watch(storage, (newStorage, _oldStorage) => {
   createNewStorage();
   retrieveStorages();
 });
+
+watch(
+  () => refresh.fetch,
+  () => {
+    retrieveTeleports();
+    retrieveStorages();
+  },
+);
 
 onMounted(() => {
   retrieveTeleports();

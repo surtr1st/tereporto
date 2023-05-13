@@ -11,17 +11,21 @@ mod teleport_cmd;
 mod toml_handler;
 
 use base::{Base, DirectoryControl};
+use crossbeam_channel::unbounded;
 use event_watcher::watch;
+use helpers::STORAGE_ARCHIVE_FOLDER;
 use helpers::{open_selected_directory, remove_quotes};
 use notify::*;
+use storage::Storage;
+use toml_handler::TOMLHandler;
+use std::fs;
 use std::path::PathBuf;
-use std::sync::Mutex;
 use std::sync::Arc;
-use crossbeam_channel::unbounded;
+use std::sync::Mutex;
 use std::time::Duration;
-use storage_cmd::{create_storage, get_storages, update_storage, remove_storage};
+use storage_cmd::{create_storage, get_storages, remove_storage, update_storage};
 use teleport::{Teleport, TeleportTarget};
-use teleport_cmd::{create_teleport, get_teleports, update_teleport, remove_teleport};
+use teleport_cmd::{create_teleport, get_teleports, remove_teleport, update_teleport};
 
 use tauri::{
     AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, RunEvent, SystemTray, SystemTrayEvent,
@@ -30,28 +34,47 @@ use tauri::{
 
 fn main() {
     Base::init_path();
-    let connection = receive_connection();
     // Create a channel to receive events
     let (tx, rx) = unbounded();
     let rx_arc = Arc::new(Mutex::new(rx));
 
-    // Create a file system watcher
-    let watcher_config = Config::default()
-        .with_poll_interval(Duration::from_secs(2))
-        .with_compare_contents(true);
-
-    let mut watcher: RecommendedWatcher = Watcher::new(tx, watcher_config).unwrap();
-
-    // Start watching the folder for events
-    watcher
-        .watch(&PathBuf::from(&connection.0), RecursiveMode::Recursive)
-        .unwrap();
-
-    println!("Monitoring folder for file additions: {}", &connection.0);
     tauri::Builder::default()
         .setup(|_| {
             tauri::async_runtime::spawn(async move {
-                watch(rx_arc, &connection.0, &connection.1);
+                loop {
+                    let connection = receive_connection();
+                    println!("{:#?}", &connection);
+                    if connection.len() > 0 {
+                        std::thread::sleep(std::time::Duration::from_secs(2));
+                        // Create a file system watcher
+                        let watcher_config = Config::default()
+                            .with_poll_interval(Duration::from_secs(2))
+                            .with_compare_contents(true);
+
+                        let mut watcher: RecommendedWatcher =
+                            Watcher::new(tx.clone(), watcher_config).unwrap();
+
+                        // Start watching the folder for events
+                        for c in connection {
+                            println!("{}", &c.target);
+                            watcher
+                                .watch(
+                                    &PathBuf::from(remove_quotes(&c.target)),
+                                    RecursiveMode::Recursive,
+                                )
+                                .unwrap();
+
+                            println!("Monitoring folder for file additions: {}", &c.target);
+                            watch(
+                                Arc::clone(&rx_arc),
+                                &remove_quotes(&c.target),
+                                &remove_quotes(&c.destination),
+                            );
+                        }
+                    }
+                    // Delay or sleep for a certain period before the next iteration
+                    std::thread::sleep(std::time::Duration::from_secs(1));
+                }
             });
             Ok(())
         })
@@ -113,14 +136,14 @@ fn prevent_backend_on_close(_app: &AppHandle, event: RunEvent) {
     }
 }
 
-fn receive_connection() -> (String, String) {
+fn receive_connection() -> Vec<TeleportTarget> {
     let mut connection = vec![];
 
     let connected_teleports = Teleport::get_connected();
     let storages = get_storages();
 
     if connected_teleports.len() == 0 {
-        return (String::from(""), String::from(""));
+        return connection;
     }
 
     // Check if connected
@@ -135,8 +158,5 @@ fn receive_connection() -> (String, String) {
         }
     }
 
-    let teleport_dir = remove_quotes(&connection.get(0).unwrap().target);
-    let destination = remove_quotes(&connection.get(0).unwrap().destination);
-
-    (teleport_dir, destination)
+    connection
 }

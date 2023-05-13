@@ -1,8 +1,8 @@
+use crossbeam_channel::Receiver;
 use notify::event::CreateKind;
 use notify::*;
 use rayon::prelude::*;
 use std::fs;
-use crossbeam_channel::Receiver;
 use std::sync::{Arc, Mutex};
 
 pub fn watch(

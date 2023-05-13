@@ -1,6 +1,6 @@
 use crate::base::{Base, DirectoryControl};
 use crate::hash_handler::HashHandler;
-use crate::helpers::{TELEPORT_ARCHIVE_FOLDER, STORAGE_ARCHIVE_FOLDER};
+use crate::helpers::{STORAGE_ARCHIVE_FOLDER, TELEPORT_ARCHIVE_FOLDER};
 use crate::teleport::{NewTeleport, Teleport, TeleportArgs};
 use crate::toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs};
 use std::fs;
@@ -14,9 +14,14 @@ pub fn get_teleports() -> Vec<Teleport> {
         .get_recursive(TELEPORT_ARCHIVE_FOLDER)
         .get_base_directory();
 
-    for file in fs::read_dir(dir).unwrap() {
-        let entry = file.unwrap();
-        let filename = entry.path().display().to_string();
+    let entries: Vec<_> = fs::read_dir(dir)
+        .unwrap()
+        .filter_map(Result::ok)
+        .filter(|entry| entry.file_type().map(|ft| ft.is_file()).unwrap_or(false))
+        .collect();
+
+    for file in entries {
+        let filename = file.path().display().to_string().clone();
         let content = handler.retrieve(&filename).read_content();
 
         let section = content.get("teleports");
@@ -38,6 +43,7 @@ pub fn get_teleports() -> Vec<Teleport> {
                 });
             }
         }
+        println!("FROM TELEPORT CMD: {}", &filename);
     }
 
     teleports
@@ -114,9 +120,9 @@ pub fn remove_teleport(filename: String) -> Result<String, String> {
                             key: "storage",
                             to: MappedField {
                                 field: "constraint",
-                                value: ""
-                            }
-                        }
+                                value: "",
+                            },
+                        },
                     )?;
                     handler.update(
                         &mut content,
@@ -124,9 +130,9 @@ pub fn remove_teleport(filename: String) -> Result<String, String> {
                             key: "storage",
                             to: MappedField {
                                 field: "color",
-                                value: ""
-                            }
-                        }
+                                value: "",
+                            },
+                        },
                     )?;
                 }
             }

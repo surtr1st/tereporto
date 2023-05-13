@@ -105,7 +105,7 @@ impl TOMLHandler {
     pub fn remove(&mut self, filename: &str) -> Result<String, String> {
         match fs::remove_file(filename) {
             Ok(_) => Ok(format!("Removed: {}", filename)),
-            Err(_) => panic!("Cannot remove: {}", filename)
+            Err(_) => panic!("Cannot remove: {}", filename),
         }
     }
 }
