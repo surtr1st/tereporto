@@ -85,56 +85,48 @@ pub fn update_storage(filename: String, target: MappedField) -> Result<String, S
 #[tauri::command]
 pub fn remove_storage(filename: String) -> Result<String, String> {
     let mut handler = TOMLHandler::default();
-    let teleport_path = Base::init_path()
+    let teleport_dir = Base::init_path()
         .get_recursive(TELEPORT_ARCHIVE_FOLDER)
         .get_base_directory();
     let dir = Base::init_path()
         .get_recursive(STORAGE_ARCHIVE_FOLDER)
         .get_base_directory(); 
 
-    let file = format!("{}/{}", &dir, &filename);
-
-    let mut teleport_dirs = vec![];
-    for t_file in fs::read_dir(&dir).unwrap() {
-        let entry = t_file.unwrap();
-        let filename = entry.path().display().to_string();
-        let content = handler.retrieve(&filename).read_content();
+    for file in fs::read_dir(&teleport_dir).unwrap() {
+        let entry = file.unwrap();
+        let file_in_teleport = entry.path().display().to_string();
+        let mut content = handler.retrieve(&file_in_teleport).read_content();
 
         let section = content.get("teleports");
         if let Some(teleport) = section {
             if let Some(t) = teleport.as_table() {
-                teleport_dirs = t.get("directories")
-                    .unwrap()
-                    .as_array()
-                    .unwrap()
-                    .to_vec();
+                let constraint = t.get("to").unwrap().to_string();
+                if &constraint == &filename {
+                    handler.update(
+                        &mut content,
+                        TOMLUpdateArgs {
+                            key: "teleports",
+                            to: MappedField {
+                                field: "to",
+                                value: ""
+                            }
+                        }
+                    )?;
+                    handler.update(
+                        &mut content,
+                        TOMLUpdateArgs {
+                            key: "teleports",
+                            to: MappedField {
+                                field: "color",
+                                value: ""
+                            }
+                        }
+                    )?;
+                }
             }
         }
     }
 
-    let mut content = handler.retrieve(&file).read_content();
-    if teleport_dirs.len() >= 1 {
-        handler.update(
-            &mut content,
-            TOMLUpdateArgs {
-                key: "teleports",
-                to: MappedField {
-                    field: "to",
-                    value: ""
-                }
-            }
-        )?;
-        handler.update(
-            &mut content,
-            TOMLUpdateArgs {
-                key: "teleports",
-                to: MappedField {
-                    field: "color",
-                    value: ""
-                }
-            }
-        )?;
-    }
-
+    let file = format!("{}/{}.toml", &dir, &filename);
     handler.remove(&file)
 }
