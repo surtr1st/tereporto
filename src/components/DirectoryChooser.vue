@@ -11,6 +11,7 @@ defineProps<IDirectoryChooser>();
 const emit = defineEmits(['update:select']);
 
 async function openFileChooser() {
+  console.log(true);
   const selected = await open({
     directory: true,
     multiple: true,

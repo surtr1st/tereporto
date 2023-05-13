@@ -22,23 +22,27 @@ import FolderTransferIcon from './components/Icon/FolderTransferIcon.vue';
 import TrashIcon from './components/Icon/TrashIcon.vue';
 import FunctionalPanel from './components/FunctionalPanel.vue';
 import Checkbox from './components/Checkbox.vue';
+import { useDirectoryControl } from './server/dir-control';
+import Modal from './components/Modal.vue';
+import ModalContent from './components/ModalContent.vue';
+import { refresh } from './globals';
 </script>
 
 <script setup lang="ts">
 const open = ref<boolean>(false);
+const openDirs = ref<boolean>(false);
 const teleport = ref<string | string[]>('');
 const storage = ref<string | string[]>('');
 const teleports = ref<TeleportResponse[] | undefined>([]);
 const storages = ref<StorageResponse[] | undefined>([]);
-const { getTeleports, createTeleport } = useTeleport();
-const { getStorages, createStorage } = useStorage();
+const teleportDirs = ref<{ index: string; dirs: string[] }[]>([]);
+const { getTeleports, createTeleport, removeTeleport } = useTeleport();
+const { getStorages, createStorage, removeStorage } = useStorage();
+const { openSelectedDir } = useDirectoryControl();
 
 function retrieveTeleports() {
   getTeleports()
-    .then((res) => {
-      console.log(res);
-      teleports.value = res;
-    })
+    .then((res) => (teleports.value = res))
     .catch((e) => console.log(e));
 }
 
@@ -75,6 +79,15 @@ function createNewStorage() {
   );
 }
 
+function handleSelectedDirs(index: string) {
+  console.log(teleports.value);
+  const selected = teleports.value
+    ?.filter((t) => t.index === index)
+    .map((v) => v.directories);
+  console.log(selected);
+  openDirs.value = true;
+}
+
 watch(teleport, (newTeleport, _oldTeleport) => {
   if (newTeleport.length === 0) return;
   createNewTeleport();
@@ -86,6 +99,14 @@ watch(storage, (newStorage, _oldStorage) => {
   createNewStorage();
   retrieveStorages();
 });
+
+watch(
+  () => refresh.fetch,
+  () => {
+    retrieveTeleports();
+    retrieveStorages();
+  },
+);
 
 onMounted(() => {
   retrieveTeleports();
@@ -133,11 +154,19 @@ onMounted(() => {
               <Descriptive
                 :title="removeQuotes(teleport.name)"
                 :description="teleport.directories"
+                @action="
+                  teleport.directories.length === 1
+                    ? handleSelectedDirs(teleport.index)
+                    : openSelectedDir(
+                        removeQuotes(teleport.directories.join('')),
+                      )
+                "
               />
               <Button
                 rounded
                 :name="'teleport-trash-btn-' + index"
                 color="danger"
+                @click="removeTeleport(removeQuotes(teleport.index))"
               >
                 <TrashIcon />
               </Button>
@@ -162,11 +191,13 @@ onMounted(() => {
               <Descriptive
                 :title="removeQuotes(storage.name)"
                 :description="removeQuotes(storage.directory)"
+                @action="openSelectedDir(removeQuotes(storage.directory))"
               />
               <Button
                 rounded
                 :name="'storage-trash-btn-' + index"
                 color="danger"
+                @click="removeStorage(removeQuotes(storage.index))"
               >
                 <TrashIcon />
               </Button>
@@ -209,6 +240,17 @@ onMounted(() => {
       </Flex>
     </GridItem>
   </Grid>
+  <Modal
+    :open="openDirs"
+    title="Directories"
+    @close="openDirs = false"
+  >
+    <ModalContent>
+      <Flex>
+        <Descriptive description="dir.dirs" />
+      </Flex>
+    </ModalContent>
+  </Modal>
   <ConnectionPanel
     :open="open"
     title="Connection Panel"

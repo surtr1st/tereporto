@@ -1,6 +1,6 @@
 use crate::base::{Base, DirectoryControl};
 use crate::hash_handler::HashHandler;
-use crate::helpers::TELEPORT_ARCHIVE_FOLDER;
+use crate::helpers::{STORAGE_ARCHIVE_FOLDER, TELEPORT_ARCHIVE_FOLDER};
 use crate::teleport::{NewTeleport, Teleport, TeleportArgs};
 use crate::toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs};
 use std::fs;
@@ -14,16 +14,17 @@ pub fn get_teleports() -> Vec<Teleport> {
         .get_recursive(TELEPORT_ARCHIVE_FOLDER)
         .get_base_directory();
 
-    for file in fs::read_dir(dir).unwrap() {
-        let entry = file.unwrap();
-        let filename = entry.path().display().to_string();
+    let entries: Vec<_> = fs::read_dir(dir)
+        .unwrap()
+        .filter_map(Result::ok)
+        .filter(|entry| entry.file_type().map(|ft| ft.is_file()).unwrap_or(false))
+        .collect();
+
+    for file in entries {
+        let filename = file.path().display().to_string().clone();
         let content = handler.retrieve(&filename).read_content();
 
         let section = content.get("teleports");
-        if section.is_none() {
-            continue;
-        }
-
         if let Some(teleport) = section {
             if let Some(t) = teleport.as_table() {
                 teleports.push(Teleport {
@@ -32,9 +33,10 @@ pub fn get_teleports() -> Vec<Teleport> {
                     directories: t
                         .get("directories")
                         .unwrap()
-                        .as_table()
+                        .as_array()
+                        .unwrap()
                         .iter()
-                        .map(|dir| dir.to_string())
+                        .map(|v| v.to_string())
                         .collect(),
                     to: t.get("to").map(|value| value.to_string()),
                     color: t.get("color").map(|value| value.to_string()),
@@ -89,4 +91,53 @@ pub fn update_teleport(filename: String, target: MappedField) -> Result<String, 
             },
         },
     )
+}
+
+#[tauri::command]
+pub fn remove_teleport(filename: String) -> Result<String, String> {
+    let mut handler = TOMLHandler::default();
+    let dir = Base::init_path()
+        .get_recursive(TELEPORT_ARCHIVE_FOLDER)
+        .get_base_directory();
+    let storage_dir = Base::init_path()
+        .get_recursive(STORAGE_ARCHIVE_FOLDER)
+        .get_base_directory();
+
+    for file in fs::read_dir(&storage_dir).unwrap() {
+        let entry = file.unwrap();
+        let file_in_storage = entry.path().display().to_string();
+        let mut content = handler.retrieve(&file_in_storage).read_content();
+
+        let section = content.get("storage");
+        if let Some(storage) = section {
+            if let Some(s) = storage.as_table() {
+                let constraint = s.get("constraint").unwrap().to_string();
+                if *constraint == *filename {
+                    handler.update(
+                        &mut content,
+                        TOMLUpdateArgs {
+                            key: "storage",
+                            to: MappedField {
+                                field: "constraint",
+                                value: "",
+                            },
+                        },
+                    )?;
+                    handler.update(
+                        &mut content,
+                        TOMLUpdateArgs {
+                            key: "storage",
+                            to: MappedField {
+                                field: "color",
+                                value: "",
+                            },
+                        },
+                    )?;
+                }
+            }
+        }
+    }
+
+    let file = format!("{}/{}.toml", &dir, &filename);
+    handler.remove(&file)
 }

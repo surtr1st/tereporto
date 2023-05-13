@@ -4,40 +4,50 @@ use crate::{
     hash_handler::HashHandler,
     toml_handler::TOMLHandler,
 };
+use regex::Regex;
 
 pub const TELEPORT_ARCHIVE_FOLDER: &str = "teleports";
 pub const STORAGE_ARCHIVE_FOLDER: &str = "storages";
 
 pub struct ConnectionBetween<'cb> {
-    pub teleport: &'cb str,
-    pub storage: &'cb str,
+    pub teleport_index: &'cb str,
+    pub storage_index: &'cb str,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct Constraint {
+    pub current_connect: String,
+    pub directory: String,
+}
+
+#[tauri::command]
+pub fn open_selected_directory(dir: &str) -> Result<(), String> {
+    match open::that(dir) {
+        Ok(status) => Ok(()),
+        Err(_) => Err(String::from("Cannot open selected directory!")),
+    }
 }
 
 pub fn has_connected(c: ConnectionBetween) -> bool {
     let mut handler = TOMLHandler::default();
 
-    let filename_encrypted = (
-        HashHandler::encrypt(c.teleport),
-        HashHandler::encrypt(c.storage),
-    );
-
-    let first_file = format!(
+    let teleport = format!(
         "{}/{}",
         Base::init_path()
             .get_recursive(TELEPORT_ARCHIVE_FOLDER)
             .get_base_directory(),
-        filename_encrypted.0
+        c.teleport_index
     );
-    let second_file = format!(
+    let storage = format!(
         "{}/{}",
         Base::init_path()
             .get_recursive(STORAGE_ARCHIVE_FOLDER)
             .get_base_directory(),
-        filename_encrypted.1
+        c.storage_index
     );
 
-    let t = handler.retrieve(&first_file).read_content();
-    let s = handler.retrieve(&second_file).read_content();
+    let t = handler.retrieve(&teleport).read_content();
+    let s = handler.retrieve(&storage).read_content();
 
     let mut indexes = vec![];
     if let Some(section) = t.get("teleports") {
@@ -53,4 +63,9 @@ pub fn has_connected(c: ConnectionBetween) -> bool {
     }
 
     indexes[0] == indexes[1]
+}
+
+pub fn remove_quotes(target: &str) -> String {
+    let regex = Regex::new("\"").unwrap();
+    format!("{}", regex.replace_all(target, ""))
 }

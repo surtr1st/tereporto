@@ -27,9 +27,19 @@ export function useStorage() {
     }
   };
 
+  const removeStorage = async (filename: string) => {
+    try {
+      const result = await invoke<string>('remove_storage', { filename });
+      console.log(result);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return {
     getStorages,
     createStorage,
     updateStorage,
+    removeStorage,
   };
 }

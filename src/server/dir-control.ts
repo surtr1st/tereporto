@@ -1,9 +1,9 @@
 import { invoke } from '@tauri-apps/api';
 
 export function useDirectoryControl() {
-  const openSelectedDir = async (directory: string) => {
+  const openSelectedDir = async (dir: string) => {
     try {
-      await invoke('open_selected_directory', { directory });
+      await invoke('open_selected_directory', { dir });
     } catch (e) {
       console.log(e);
     }
