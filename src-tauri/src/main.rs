@@ -16,7 +16,8 @@ use helpers::{open_selected_directory, remove_quotes};
 use notify::*;
 use std::path::PathBuf;
 use std::sync::Mutex;
-use std::sync::{mpsc::channel, Arc};
+use std::sync::Arc;
+use crossbeam_channel::unbounded;
 use std::time::Duration;
 use storage_cmd::{create_storage, get_storages, update_storage, remove_storage};
 use teleport::{Teleport, TeleportTarget};
@@ -29,9 +30,9 @@ use tauri::{
 
 fn main() {
     Base::init_path();
-    let t = teleport();
+    let connection = receive_connection();
     // Create a channel to receive events
-    let (tx, rx) = channel();
+    let (tx, rx) = unbounded();
     let rx_arc = Arc::new(Mutex::new(rx));
 
     // Create a file system watcher
@@ -43,12 +44,17 @@ fn main() {
 
     // Start watching the folder for events
     watcher
-        .watch(&PathBuf::from(&t.0), RecursiveMode::Recursive)
+        .watch(&PathBuf::from(&connection.0), RecursiveMode::Recursive)
         .unwrap();
 
-    println!("Monitoring folder for file additions: {}", &t.0);
-
+    println!("Monitoring folder for file additions: {}", &connection.0);
     tauri::Builder::default()
+        .setup(|_| {
+            tauri::async_runtime::spawn(async move {
+                watch(rx_arc, &connection.0, &connection.1);
+            });
+            Ok(())
+        })
         .system_tray(create_system_tray())
         .on_system_tray_event(handle_system_tray)
         .on_window_event(prevent_frontend_on_close)
@@ -65,14 +71,7 @@ fn main() {
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
-        .run(move |app, event| {
-            let rx_clone = Arc::clone(&rx_arc);
-            let inner_t = teleport();
-            tauri::async_runtime::spawn(async move {
-                watch(rx_clone, &inner_t.0, &inner_t.1);
-            });
-            prevent_backend_on_close(app, event);
-        })
+        .run(prevent_backend_on_close)
 }
 
 fn create_system_tray() -> SystemTray {
@@ -114,12 +113,17 @@ fn prevent_backend_on_close(_app: &AppHandle, event: RunEvent) {
     }
 }
 
-fn teleport() -> (String, String) {
+fn receive_connection() -> (String, String) {
     let mut connection = vec![];
 
-    // Check if connected
     let connected_teleports = Teleport::get_connected();
     let storages = get_storages();
+
+    if connected_teleports.len() == 0 {
+        return (String::from(""), String::from(""));
+    }
+
+    // Check if connected
     for t in &connected_teleports {
         for s in &storages {
             if t.current_connect == s.index {

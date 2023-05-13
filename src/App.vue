@@ -157,7 +157,7 @@ onMounted(() => {
                 rounded
                 :name="'teleport-trash-btn-' + index"
                 color="danger"
-                @click="removeTeleport(`${teleport.index}.toml`)"
+                @click="removeTeleport(removeQuotes(teleport.index))"
               >
                 <TrashIcon />
               </Button>
@@ -188,7 +188,7 @@ onMounted(() => {
                 rounded
                 :name="'storage-trash-btn-' + index"
                 color="danger"
-                @click="removeStorage(`${storage.index}.toml`)"
+                @click="removeStorage(removeQuotes(storage.index))"
               >
                 <TrashIcon />
               </Button>

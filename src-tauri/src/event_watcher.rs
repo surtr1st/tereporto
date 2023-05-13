@@ -2,7 +2,7 @@ use notify::event::CreateKind;
 use notify::*;
 use rayon::prelude::*;
 use std::fs;
-use std::sync::mpsc::Receiver;
+use crossbeam_channel::Receiver;
 use std::sync::{Arc, Mutex};
 
 pub fn watch(

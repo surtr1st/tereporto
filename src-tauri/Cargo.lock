@@ -3227,6 +3227,7 @@ version = "0.2.0"
 dependencies = [
  "bcrypt",
  "clap",
+ "crossbeam-channel",
  "crypto",
  "digest",
  "env_logger",
