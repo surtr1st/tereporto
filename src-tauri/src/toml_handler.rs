@@ -102,6 +102,18 @@ impl TOMLHandler {
         self.compose(&data)
     }
 
+    pub fn remove_field(&mut self, content: &mut toml::Value, key: &str, field: &str) -> Result<String, String> {
+        // Check if the key exists
+        if let Some(table) = content.get_mut(key).and_then(toml::Value::as_table_mut) {
+            // Remove the field if it exists
+            table.remove(field);
+        }
+
+        // Serialize the modified TOML back to a string
+        let updated = toml::to_string_pretty(&content).expect("should be serialized the data back to string");
+        self.compose(&updated)
+    }
+
     pub fn remove(&mut self, filename: &str) -> Result<String, String> {
         match fs::remove_file(filename) {
             Ok(_) => Ok(format!("Removed: {}", filename)),

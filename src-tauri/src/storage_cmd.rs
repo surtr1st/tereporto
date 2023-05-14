@@ -1,6 +1,6 @@
 use crate::base::{Base, DirectoryControl};
 use crate::hash_handler::HashHandler;
-use crate::helpers::{STORAGE_ARCHIVE_FOLDER, TELEPORT_ARCHIVE_FOLDER};
+use crate::helpers::{STORAGE_ARCHIVE_FOLDER, TELEPORT_ARCHIVE_FOLDER, remove_quotes};
 use crate::storage::{NewStorage, Storage, StorageArgs};
 use crate::toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs};
 use std::fs;
@@ -104,28 +104,10 @@ pub fn remove_storage(filename: String) -> Result<String, String> {
         let section = content.get("teleports");
         if let Some(teleport) = section {
             if let Some(t) = teleport.as_table() {
-                let constraint = t.get("to").unwrap().to_string();
+                let constraint = remove_quotes(&t.get("to").unwrap().to_string());
                 if *constraint == *filename {
-                    handler.update(
-                        &mut content,
-                        TOMLUpdateArgs {
-                            key: "teleports",
-                            to: MappedField {
-                                field: "to",
-                                value: "",
-                            },
-                        },
-                    )?;
-                    handler.update(
-                        &mut content,
-                        TOMLUpdateArgs {
-                            key: "teleports",
-                            to: MappedField {
-                                field: "color",
-                                value: "",
-                            },
-                        },
-                    )?;
+                    handler.remove_field(&mut content, "teleports", "to").unwrap();
+                    handler.remove_field(&mut content, "teleports", "color").unwrap();
                 }
             }
         }
