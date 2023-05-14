@@ -39,32 +39,35 @@ fn main() {
             tauri::async_runtime::spawn(async move {
                 loop {
                     let connection = receive_connection();
+                    println!("Watching...");
                     if !connection.is_empty() {
-                        std::thread::sleep(std::time::Duration::from_secs(2));
-                        // Create a file system watcher
-                        let watcher_config = Config::default()
-                            .with_poll_interval(Duration::from_secs(2))
-                            .with_compare_contents(true);
-
-                        let mut watcher: RecommendedWatcher =
-                            Watcher::new(tx.clone(), watcher_config).unwrap();
-
-                        // Start watching the folder for events
+                        // Handle each watcher
                         for c in connection {
-                            println!("{}", &c.target);
-                            watcher
-                                .watch(
-                                    &PathBuf::from(remove_quotes(&c.target)),
-                                    RecursiveMode::Recursive,
-                                )
-                                .unwrap();
+                            let tx_clone = tx.clone();
+                            let rx_clone = Arc::clone(&rx_arc);
+                            let target = remove_quotes(&c.target);
+                            let destination = remove_quotes(&c.destination); 
 
-                            println!("Monitoring folder for file additions: {}", &c.target);
-                            watch(
-                                Arc::clone(&rx_arc),
-                                &remove_quotes(&c.target),
-                                &remove_quotes(&c.destination),
-                            );
+                            std::thread::spawn(move || {
+                                // Create a file system watcher
+                                let config = Config::default()
+                                    .with_poll_interval(Duration::from_secs(2))
+                                    .with_compare_contents(true);
+                                let mut watcher: RecommendedWatcher =
+                                Watcher::new(tx_clone, config).unwrap();
+                                watcher
+                                    .watch(
+                                        &PathBuf::from(&target),
+                                        RecursiveMode::Recursive,
+                                    )
+                                    .unwrap();
+                                // Start watching the folder for events
+                                watch(
+                                    rx_clone,
+                                    &target,
+                                    &destination
+                                );
+                            });
                         }
                     }
                     // Delay or sleep for a certain period before the next iteration
