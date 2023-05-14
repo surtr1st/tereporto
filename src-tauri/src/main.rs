@@ -14,7 +14,8 @@ use base::{Base, DirectoryControl};
 use crossbeam_channel::unbounded;
 use event_watcher::watch;
 use helpers::{open_selected_directory, remove_quotes};
-use notify::*;
+use notify::{RecursiveMode, RecommendedWatcher, Watcher, Config};
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -34,48 +35,61 @@ fn main() {
     let (tx, rx) = unbounded();
     let rx_arc = Arc::new(Mutex::new(rx));
 
-    tauri::Builder::default()
-        .setup(|_| {
-            tauri::async_runtime::spawn(async move {
-                loop {
-                    let connection = receive_connection();
-                    println!("Watching...");
-                    if !connection.is_empty() {
-                        // Handle each watcher
-                        for c in connection {
-                            let tx_clone = tx.clone();
-                            let rx_clone = Arc::clone(&rx_arc);
-                            let target = remove_quotes(&c.target);
-                            let destination = remove_quotes(&c.destination); 
+    tauri::async_runtime::spawn(async move {
+        let map = Arc::new(Mutex::new(HashMap::<String, String>::default()));
+        loop {
+            let connection = receive_connection();
+            if !connection.is_empty() {
+                let mut threads = vec![];
+                // Handle each watcher
+                for c in connection {
+                    let tx_clone = tx.clone();
+                    let rx_clone = Arc::clone(&rx_arc);
+                    let target = remove_quotes(&c.target);
+                    let destination = remove_quotes(&c.destination);
 
-                            std::thread::spawn(move || {
-                                // Create a file system watcher
-                                let config = Config::default()
-                                    .with_poll_interval(Duration::from_secs(2))
-                                    .with_compare_contents(true);
-                                let mut watcher: RecommendedWatcher =
-                                Watcher::new(tx_clone, config).unwrap();
-                                watcher
-                                    .watch(
-                                        &PathBuf::from(&target),
-                                        RecursiveMode::Recursive,
-                                    )
-                                    .unwrap();
-                                // Start watching the folder for events
-                                watch(
-                                    rx_clone,
-                                    &target,
-                                    &destination
-                                );
-                            });
-                        }
-                    }
-                    // Delay or sleep for a certain period before the next iteration
-                    std::thread::sleep(std::time::Duration::from_secs(1));
+                    let map_clone = Arc::clone(&map);
+                    map_clone
+                        .lock()
+                        .unwrap()
+                        .insert(target.clone(), destination.clone());
+
+                    let thread_watcher = std::thread::spawn(move || {
+                        let tx = tx_clone;
+                        let rx = rx_clone;
+                        let target = target;
+                        let map_inner_clone = Arc::clone(&map_clone);
+
+                        let config = Config::default()
+                            .with_poll_interval(Duration::from_secs(2))
+                            .with_compare_contents(true);
+                        // Create a file system watcher
+                        let mut watcher: RecommendedWatcher =
+                        Watcher::new(tx, config).unwrap();
+
+                        watcher
+                            .watch(
+                                &PathBuf::from(&target),
+                                RecursiveMode::Recursive,
+                            )
+                            .unwrap(); 
+
+                        std::thread::sleep(std::time::Duration::from_secs(1));
+                        watch(rx, map_inner_clone);
+                    });
+                    threads.push(thread_watcher);
                 }
-            });
-            Ok(())
-        })
+
+                for th in threads {
+                    th.join().unwrap();
+                }
+            }
+            // Delay or sleep for a certain period before the next iteration
+            std::thread::sleep(std::time::Duration::from_secs(1));
+        }
+    });
+
+    tauri::Builder::default()
         .system_tray(create_system_tray())
         .on_system_tray_event(handle_system_tray)
         .on_window_event(prevent_frontend_on_close)
