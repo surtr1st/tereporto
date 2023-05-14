@@ -8,6 +8,7 @@ interface IButton {
   rounded?: boolean;
   larger?: boolean;
   onClick?: () => void | string | Promise<void | string>;
+  disabled?: boolean;
 }
 const { larger, rounded, color } = defineProps<IButton>();
 
@@ -27,6 +28,7 @@ if (larger) className.value += ' tp__button--larger';
     :aria-label="name"
     :title="label"
     @click="onClick"
+    :disabled="disabled"
   >
     <slot />
     {{ label }}
@@ -38,6 +40,7 @@ if (larger) className.value += ' tp__button--larger';
     :aria-label="name"
     :title="label"
     @click="onClick"
+    :disabled="disabled"
   >
     <slot />
     {{ label }}
@@ -49,6 +52,7 @@ if (larger) className.value += ' tp__button--larger';
     :aria-label="name"
     :title="label"
     @click="onClick"
+    :disabled="disabled"
   >
     <slot />
     {{ label }}
@@ -78,21 +82,41 @@ if (larger) className.value += ' tp__button--larger';
   background: var(--darker-color);
   color: white;
 }
+
 .tp__button--darker:hover {
   background: var(--light-neutral-gray);
 }
+
+.tp__button--darker:disabled {
+  background: #000000;
+  cursor: not-allowed;
+}
+
 .tp__button--neutral {
   background: var(--neutral-gray);
   color: white;
 }
+
 .tp__button--neutral:hover {
   background: var(--light-neutral-gray);
 }
+
+.tp__button--neutral:disabled {
+  background: #000000;
+  cursor: not-allowed;
+}
+
 .tp__button--danger {
   background: var(--danger-color);
   color: black;
 }
+
 .tp__button--danger:hover {
   background: var(--light-danger-color);
+}
+
+.tp__button--danger:disabled {
+  background: #000000;
+  cursor: not-allowed;
 }
 </style>

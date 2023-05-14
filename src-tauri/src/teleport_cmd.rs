@@ -122,7 +122,7 @@ pub fn remove_teleport(filename: String) -> Result<String, String> {
                                 value: "",
                             },
                         },
-                    )?;
+                    ).unwrap();
                     handler.update(
                         &mut content,
                         TOMLUpdateArgs {
@@ -132,7 +132,7 @@ pub fn remove_teleport(filename: String) -> Result<String, String> {
                                 value: "",
                             },
                         },
-                    )?;
+                    ).unwrap();
                 }
             }
         }

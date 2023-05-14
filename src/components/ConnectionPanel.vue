@@ -54,8 +54,8 @@ function connect() {
     }),
   ])
     .then(() => {
-      onClose!();
       refresh.fetch = !refresh.fetch;
+      onClose!();
     })
     .catch((e) => console.log(e));
 }
@@ -118,6 +118,7 @@ function connect() {
           rounded
           larger
           @click="connect()"
+          :disabled="teleportIndex.length === 0 || storageIndex.length === 0"
         />
       </Flex>
     </ModalFooter>
