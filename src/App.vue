@@ -3,9 +3,9 @@ import { onMounted, ref, watch } from 'vue';
 import { StorageResponse, TeleportResponse } from './types';
 import { useStorage, useTeleport, useDirectoryControl } from './server';
 import { removeQuotes } from './helpers';
+import { refresh } from './globals';
 import ConnectionPanel from './components/ConnectionPanel.vue';
 import Button from './components/Button.vue';
-import ButtonGroup from './components/ButtonGroup.vue';
 import Descriptive from './components/Descriptive.vue';
 import StoragePanel from './components/StoragePanel.vue';
 import TeleportPanel from './components/TeleportPanel.vue';
@@ -24,7 +24,10 @@ import FunctionalPanel from './components/FunctionalPanel.vue';
 import Checkbox from './components/Checkbox.vue';
 import Modal from './components/Modal.vue';
 import ModalContent from './components/ModalContent.vue';
-import { refresh } from './globals';
+import GearIcon from './components/Icon/GearIcon.vue';
+import FolderPathConnectIcon from './components/Icon/FolderPathConnectIcon.vue';
+import MapMarkerIcon from './components/Icon/MapMarkerIcon.vue';
+import DatabaseMarkerIcon from './components/Icon/DatabaseMarker.vue';
 </script>
 
 <script setup lang="ts">
@@ -229,33 +232,47 @@ onMounted(() => {
     <GridItem position="footer">
       <Flex justify-content="center">
         <FunctionalPanel>
-          <Checkbox label="Start along side with OS" />
           <Checkbox label="Auto-scan" />
           <DirectoryChooser
             label="New Teleport"
             name="teleport"
             v-model:select="teleport"
-          />
+          >
+            <MapMarkerIcon />
+          </DirectoryChooser>
           <DirectoryChooser
             label="New Storage"
             name="storage"
             v-model:select="storage"
+          >
+            <DatabaseMarkerIcon />
+          </DirectoryChooser>
+          <Button
+            name="scan-btn"
+            label="Scan Teleport"
+            color="darker"
+            rounded
+            larger
           />
-          <ButtonGroup>
-            <Button
-              name="scan-btn"
-              label="Scan Teleport"
-              color="darker"
-              larger
-            />
-            <Button
-              name="choose-btn"
-              label="Choose"
-              color="darker"
-              larger
-              @click="open = true"
-            />
-          </ButtonGroup>
+          <Button
+            name="connection-btn"
+            label="Connect"
+            color="danger"
+            rounded
+            larger
+            icon
+            @click="open = true"
+          >
+            <FolderPathConnectIcon />
+          </Button>
+          <Button
+            name="settings-btn"
+            color="darker"
+            rounded
+            icon
+          >
+            <GearIcon />
+          </Button>
         </FunctionalPanel>
       </Flex>
     </GridItem>

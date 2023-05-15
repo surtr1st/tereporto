@@ -5,6 +5,7 @@ import { open } from '@tauri-apps/api/dialog';
 interface IDirectoryChooser {
   label?: string;
   name?: string;
+  rounded?: boolean;
   onSelect?: () => void | Promise<void>;
 }
 defineProps<IDirectoryChooser>();
@@ -31,5 +32,8 @@ async function openFileChooser() {
     rounded
     :name="name"
     @click="openFileChooser"
-  />
+    icon
+  >
+    <slot />
+  </Button>
 </template>
