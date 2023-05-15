@@ -7,6 +7,7 @@ import RadioButton from './RadioButton.vue';
 import Modal from './Modal.vue';
 import ModalContent from './ModalContent.vue';
 import ModalFooter from './ModalFooter.vue';
+import PlaceHolder from './PlaceHolder.vue';
 import { StorageResponse, TeleportResponse } from '../types';
 import { ref } from 'vue';
 import { removeQuotes, generateRandomHexColor } from '../helpers';
@@ -68,12 +69,19 @@ function connect() {
     @close="onClose"
   >
     <ModalContent>
-      <Grid type="panel">
-        <GridItem position="main">
+      <Flex
+        justify-content="center"
+        align-items="center"
+        :gap="50"
+        :margin-bottom="25"
+        :margin-top="25"
+      >
+        <PlaceHolder title="Teleports">
           <Flex
             justify-content="center"
             align-items="flex-start"
             column
+            :width="150"
           >
             <RadioButton
               v-for="(teleport, index) in teleports"
@@ -85,12 +93,13 @@ function connect() {
               v-model:selected="teleportIndex"
             />
           </Flex>
-        </GridItem>
-        <GridItem position="aside">
+        </PlaceHolder>
+        <PlaceHolder title="Storages">
           <Flex
             justify-content="center"
             align-items="flex-start"
             column
+            :width="120"
           >
             <RadioButton
               v-for="(storage, index) in storages"
@@ -103,8 +112,8 @@ function connect() {
               v-model:selected="storageIndex"
             />
           </Flex>
-        </GridItem>
-      </Grid>
+        </PlaceHolder>
+      </Flex>
     </ModalContent>
     <ModalFooter>
       <Flex

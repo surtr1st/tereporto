@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { StyleValue } from 'vue';
+
 interface ICheckbox {
   name?: string;
   label?: string;
   checked?: boolean;
+  style?: StyleValue;
 }
 defineProps<ICheckbox>();
 </script>
@@ -11,6 +14,7 @@ defineProps<ICheckbox>();
   <label
     :for="name"
     class="tp__checkbox-label"
+    :style="style"
   >
     {{ label }}
     <input
@@ -35,6 +39,7 @@ defineProps<ICheckbox>();
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  color: white;
   background: inherit;
 }
 
@@ -55,7 +60,7 @@ defineProps<ICheckbox>();
   height: 24px;
   width: 24px;
   border-radius: 50%;
-  background: var(--darker-neutral);
+  background: var(--light-neutral-gray);
   transition: all 150ms;
 }
 

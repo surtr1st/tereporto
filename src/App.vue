@@ -21,17 +21,18 @@ import FolderDestinationIcon from './components/Icon/FolderDestinationIcon.vue';
 import FolderTransferIcon from './components/Icon/FolderTransferIcon.vue';
 import TrashIcon from './components/Icon/TrashIcon.vue';
 import FunctionalPanel from './components/FunctionalPanel.vue';
-import Checkbox from './components/Checkbox.vue';
 import Modal from './components/Modal.vue';
 import ModalContent from './components/ModalContent.vue';
 import GearIcon from './components/Icon/GearIcon.vue';
 import FolderPathConnectIcon from './components/Icon/FolderPathConnectIcon.vue';
 import MapMarkerIcon from './components/Icon/MapMarkerIcon.vue';
 import DatabaseMarkerIcon from './components/Icon/DatabaseMarker.vue';
+import SettingsPanel from './components/SettingsPanel.vue';
 </script>
 
 <script setup lang="ts">
-const open = ref<boolean>(false);
+const openConnection = ref<boolean>(false);
+const openSettings = ref<boolean>(false);
 const openDirs = ref<boolean>(false);
 const teleport = ref<string | string[]>('');
 const storage = ref<string | string[]>('');
@@ -232,7 +233,6 @@ onMounted(() => {
     <GridItem position="footer">
       <Flex justify-content="center">
         <FunctionalPanel>
-          <Checkbox label="Auto-scan" />
           <DirectoryChooser
             label="New Teleport"
             name="teleport"
@@ -261,7 +261,7 @@ onMounted(() => {
             rounded
             larger
             icon
-            @click="open = true"
+            @click="openConnection = true"
           >
             <FolderPathConnectIcon />
           </Button>
@@ -270,6 +270,7 @@ onMounted(() => {
             color="darker"
             rounded
             icon
+            @click="openSettings = true"
           >
             <GearIcon />
           </Button>
@@ -289,10 +290,15 @@ onMounted(() => {
     </ModalContent>
   </Modal>
   <ConnectionPanel
-    :open="open"
+    :open="openConnection"
     title="Connection Panel"
     :teleports="teleports"
     :storages="storages"
-    @close="open = false"
+    @close="openConnection = false"
+  />
+  <SettingsPanel
+    :open="openSettings"
+    title="Settings"
+    @close="openSettings = false"
   />
 </template>

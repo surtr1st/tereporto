@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { StyleValue } from 'vue';
+
 interface IRadio {
   id?: string;
   name?: string;
   label?: string;
   checked?: boolean;
   value?: string;
+  style?: StyleValue;
 }
 defineProps<IRadio>();
 defineEmits(['update:selected']);
@@ -14,6 +17,7 @@ defineEmits(['update:selected']);
   <label
     :for="id"
     class="tp__radio"
+    :style="style"
   >
     {{ label }}
     <input
@@ -59,7 +63,7 @@ defineEmits(['update:selected']);
   left: 0;
   height: 22px;
   width: 22px;
-  background-color: var(--darker-neutral);
+  background-color: var(--light-neutral-gray);
   border-radius: 50%;
   transition: all 150ms;
 }
