@@ -70,6 +70,8 @@ if (!label) className.value += ' tp__button-no-label';
   margin: 0.1rem;
   transition: all 250ms;
   font-weight: 500;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 .tp__button-no-label {
   width: 51px;
@@ -82,9 +84,9 @@ if (!label) className.value += ' tp__button-no-label';
   gap: 3px;
 }
 .tp__button--larger {
-  min-width: 100px;
-  width: 132px;
-  max-width: 150px;
+  min-width: 125px;
+  width: auto;
+  max-width: 170px;
   height: 51px;
 }
 .tp__button:hover {

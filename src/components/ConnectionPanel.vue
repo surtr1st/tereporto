@@ -76,7 +76,7 @@ function connect() {
         :margin-bottom="25"
         :margin-top="25"
       >
-        <PlaceHolder title="Teleports">
+        <PlaceHolder :title="$t('message.panel.connection.teleports')">
           <Flex
             justify-content="center"
             align-items="flex-start"
@@ -94,7 +94,7 @@ function connect() {
             />
           </Flex>
         </PlaceHolder>
-        <PlaceHolder title="Storages">
+        <PlaceHolder :title="$t('message.panel.connection.storages')">
           <Flex
             justify-content="center"
             align-items="flex-start"
@@ -123,7 +123,7 @@ function connect() {
         <Button
           name="connect-btn"
           color="neutral"
-          label="Connect"
+          :label="$t('message.feature.connection')"
           rounded
           larger
           @click="connect()"

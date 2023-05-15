@@ -1,0 +1,38 @@
+{
+  "header": {
+    "teleport": "Teleport Folders",
+    "storage": "Storage Folders"
+  },
+  "feature": {
+    "new_teleport": "New Teleport",
+    "new_storage": "New Storage",
+    "scan_teleport": "Scan Teleport",
+    "connection": "Connect",
+    "save": "Save"
+  },
+  "panel": {
+    "connection": {
+      "title": "Connection Panel",
+      "teleports": "Teleports",
+      "storages": "Storages"
+    },
+    "settings": {
+      "title": "Settings",
+      "auto": {
+        "title": "Auto-scanning teleport places",
+        "scan": "Auto-Scan"
+      },
+      "lang": {
+        "title": "Preferred language to display",
+        "vi": "VI",
+        "en": "EN",
+        "ja": "JP"
+      },
+      "system": {
+        "title": "System",
+        "exit": "Exit on close",
+        "minimize": "Minimize to tray"
+      }
+    }
+  }
+}

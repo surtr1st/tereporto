@@ -49,10 +49,10 @@ function setOptions() {}
           column
           :width="320"
         >
-          <PlaceHolder title="Auto-scanning teleport places">
-            <Checkbox label="Auto-Scan" />
+          <PlaceHolder :title="$t('message.panel.settings.auto.title')">
+            <Checkbox :label="$t('message.panel.settings.auto.scan')" />
           </PlaceHolder>
-          <PlaceHolder title="Prefer language to display">
+          <PlaceHolder :title="$t('message.panel.settings.lang.title')">
             <Flex
               justify-content="space-between"
               align-items="flex-start"
@@ -70,8 +70,7 @@ function setOptions() {}
               />
             </Flex>
           </PlaceHolder>
-          <PlaceHolder title="Systems">
-            <Checkbox label="Exit on close" />
+          <PlaceHolder :title="$t('message.panel.settings.system.title')">
           </PlaceHolder>
         </Flex>
       </Flex>
@@ -82,7 +81,7 @@ function setOptions() {}
         justify-content="center"
       >
         <Button
-          label="Save"
+          :label="$t('message.feature.save')"
           name="save-btn"
           color="neutral"
           larger

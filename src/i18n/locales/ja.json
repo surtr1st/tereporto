@@ -1,0 +1,38 @@
+{
+  "header": {
+    "teleport": "テレポートフォルダ",
+    "storage": "ストレージフォルダー"
+  },
+  "feature": {
+    "new_teleport": "新しいテレポート",
+    "new_storage": "新しいストレージ",
+    "scan_teleport": "スキャンテレポート",
+    "connection": "コネクト",
+    "save": "セーブ"
+  },
+  "panel": {
+    "connection": {
+      "title": "接続パネル",
+      "teleports": "テレポート",
+      "storages": "ストレージ"
+    },
+    "settings": {
+      "title": "セッティング",
+      "auto": {
+        "title": "テレポート場所の自動スキャン",
+        "scan": "自動スキャン"
+      },
+      "lang": {
+        "title": "表示するための優先言語",
+        "vi": "VI",
+        "en": "EN",
+        "ja": "JP"
+      },
+      "system": {
+        "title": "システム",
+        "exit": "閉じる時に終了する",
+        "minimize": "トレイに最小化する"
+      }
+    }
+  }
+}

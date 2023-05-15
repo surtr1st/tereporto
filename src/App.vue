@@ -146,7 +146,7 @@ onMounted(() => {
         align-items="center"
       >
         <TitleHeader
-          title="Teleported Folders"
+          :title="$t('message.header.teleport')"
           text-position="center"
         />
       </Flex>
@@ -157,7 +157,7 @@ onMounted(() => {
         align-items="center"
       >
         <TitleHeader
-          title="Storage Folders"
+          :title="$t('message.header.storage')"
           text-position="center"
         />
       </Flex>
@@ -234,14 +234,14 @@ onMounted(() => {
       <Flex justify-content="center">
         <FunctionalPanel>
           <DirectoryChooser
-            label="New Teleport"
+            :label="$t('message.feature.new_teleport')"
             name="teleport"
             v-model:select="teleport"
           >
             <MapMarkerIcon />
           </DirectoryChooser>
           <DirectoryChooser
-            label="New Storage"
+            :label="$t('message.feature.new_storage')"
             name="storage"
             v-model:select="storage"
           >
@@ -249,14 +249,14 @@ onMounted(() => {
           </DirectoryChooser>
           <Button
             name="scan-btn"
-            label="Scan Teleport"
+            :label="$t('message.feature.scan_teleport')"
             color="darker"
             rounded
             larger
           />
           <Button
             name="connection-btn"
-            label="Connect"
+            :label="$t('message.feature.connection')"
             color="danger"
             rounded
             larger
@@ -291,14 +291,14 @@ onMounted(() => {
   </Modal>
   <ConnectionPanel
     :open="openConnection"
-    title="Connection Panel"
+    :title="$t('message.panel.connection.title')"
     :teleports="teleports"
     :storages="storages"
     @close="openConnection = false"
   />
   <SettingsPanel
     :open="openSettings"
-    title="Settings"
+    :title="$t('message.panel.settings.title')"
     @close="openSettings = false"
   />
 </template>
