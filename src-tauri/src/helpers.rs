@@ -10,6 +10,7 @@ use regex::Regex;
 
 pub const TELEPORT_ARCHIVE_FOLDER: &str = "teleports";
 pub const STORAGE_ARCHIVE_FOLDER: &str = "storages";
+pub const SETTINGS_FILE: &str = "settings";
 
 pub struct ConnectionBetween<'cb> {
     pub teleport_index: &'cb str,

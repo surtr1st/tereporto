@@ -4,6 +4,8 @@ mod base;
 mod event_watcher;
 mod hash_handler;
 mod helpers;
+mod settings;
+mod settings_cmd;
 mod storage;
 mod storage_cmd;
 mod teleport;
@@ -14,7 +16,8 @@ use base::{Base, DirectoryControl};
 use crossbeam_channel::unbounded;
 use event_watcher::watch;
 use helpers::{open_selected_directory, remove_quotes};
-use notify::{RecursiveMode, RecommendedWatcher, Watcher, Config};
+use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
+use settings_cmd::{load_settings, save_settings};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -64,15 +67,11 @@ fn main() {
                             .with_poll_interval(Duration::from_secs(2))
                             .with_compare_contents(true);
                         // Create a file system watcher
-                        let mut watcher: RecommendedWatcher =
-                        Watcher::new(tx, config).unwrap();
+                        let mut watcher: RecommendedWatcher = Watcher::new(tx, config).unwrap();
 
                         watcher
-                            .watch(
-                                &PathBuf::from(&target),
-                                RecursiveMode::Recursive,
-                            )
-                            .unwrap(); 
+                            .watch(&PathBuf::from(&target), RecursiveMode::Recursive)
+                            .unwrap();
 
                         std::thread::sleep(std::time::Duration::from_secs(1));
                         watch(rx, map_inner_clone);
@@ -102,7 +101,9 @@ fn main() {
             update_teleport,
             open_selected_directory,
             remove_teleport,
-            remove_storage
+            remove_storage,
+            load_settings,
+            save_settings
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")

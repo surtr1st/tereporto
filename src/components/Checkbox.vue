@@ -2,25 +2,31 @@
 import { StyleValue } from 'vue';
 
 interface ICheckbox {
+  id?: string;
   name?: string;
   label?: string;
+  value?: boolean;
   checked?: boolean;
   style?: StyleValue;
 }
 defineProps<ICheckbox>();
+defineEmits(['update:selected']);
 </script>
 
 <template>
   <label
-    :for="name"
+    :for="id"
     class="tp__checkbox-label"
     :style="style"
   >
     {{ label }}
     <input
+      :id="id"
       type="checkbox"
       :checked="checked"
       :name="name"
+      :value="value"
+      @click="$emit('update:selected', value)"
     />
     <span class="tp__checkmark"></span>
   </label>
