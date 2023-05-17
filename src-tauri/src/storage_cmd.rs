@@ -114,10 +114,10 @@ pub fn remove_storage(filename: String) -> Result<String, String> {
             let constraint = remove_quotes(&constraint_field.unwrap().to_string());
             if *constraint == *filename {
                 handler
-                    .remove_field(&mut content, "teleports", "to")
+                    .remove_field(&mut content, TELEPORT_KEY, "to")
                     .unwrap();
                 handler
-                    .remove_field(&mut content, "teleports", "color")
+                    .remove_field(&mut content, TELEPORT_KEY, "color")
                     .unwrap();
             }
         }

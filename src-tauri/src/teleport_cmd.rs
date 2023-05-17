@@ -121,10 +121,10 @@ pub fn remove_teleport(filename: String) -> Result<String, String> {
             let constraint = remove_quotes(&constraint_field.unwrap().to_string());
             if *constraint == *filename {
                 handler
-                    .remove_field(&mut content, "storage", "constraint")
+                    .remove_field(&mut content, STORAGE_KEY, "constraint")
                     .unwrap();
                 handler
-                    .remove_field(&mut content, "storage", "color")
+                    .remove_field(&mut content, STORAGE_KEY, "color")
                     .unwrap();
             }
         }
