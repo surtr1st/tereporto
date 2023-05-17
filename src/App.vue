@@ -1,9 +1,4 @@
 <script lang="ts">
-import { onMounted, ref, watch } from 'vue';
-import { StorageResponse, TeleportResponse } from './types';
-import { useStorage, useTeleport, useDirectoryControl } from './server';
-import { removeQuotes } from './helpers';
-import { refresh } from './globals';
 import ConnectionPanel from './components/ConnectionPanel.vue';
 import Button from './components/Button.vue';
 import Descriptive from './components/Descriptive.vue';
@@ -28,6 +23,11 @@ import FolderPathConnectIcon from './components/Icon/FolderPathConnectIcon.vue';
 import MapMarkerIcon from './components/Icon/MapMarkerIcon.vue';
 import DatabaseMarkerIcon from './components/Icon/DatabaseMarker.vue';
 import SettingsPanel from './components/SettingsPanel.vue';
+import { onMounted, ref, watch } from 'vue';
+import { StorageResponse, TeleportResponse } from './types';
+import { useStorage, useTeleport, useDirectoryControl } from './server';
+import { removeQuotes } from './helpers';
+import { refresh } from './globals';
 </script>
 
 <script setup lang="ts">
@@ -84,28 +84,18 @@ function createNewStorage() {
 
 function removeSelectedTeleport(index: string) {
   removeTeleport(removeQuotes(index))
-    .then((res) => {
-      console.log(res);
-      refresh.fetch != refresh.fetch;
-    })
+    .then(() => (refresh.fetch = !refresh.fetch))
     .catch((e) => console.log(e));
 }
 
 function removeSelectedStorage(index: string) {
   removeStorage(removeQuotes(index))
-    .then((res) => {
-      console.log(res);
-      refresh.fetch != refresh.fetch;
-    })
+    .then(() => (refresh.fetch = !refresh.fetch))
     .catch((e) => console.log(e));
 }
 
 function handleSelectedDirs(index: string) {
-  console.log(teleports.value);
-  const selected = teleports.value
-    ?.filter((t) => t.index === index)
-    .map((v) => v.directories);
-  console.log(selected);
+  teleports.value?.filter((t) => t.index === index).map((v) => v.directories);
   openDirs.value = true;
 }
 
@@ -123,8 +113,7 @@ watch(storage, (newStorage, _oldStorage) => {
 
 watch(
   () => refresh.fetch,
-  (newValue, _oldValue) => {
-    console.log(newValue, _oldValue);
+  () => {
     retrieveTeleports();
     retrieveStorages();
   },

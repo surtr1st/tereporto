@@ -21,7 +21,7 @@ interface IConnectionPanel {
 }
 const { onClose } = defineProps<IConnectionPanel>();
 const { load, save } = useSettings();
-const { t, locale } = useI18n();
+const { locale } = useI18n();
 
 const langs = [
   { name: 'VI', value: 'vi' },
@@ -30,8 +30,8 @@ const langs = [
 ];
 
 const systems = [
-  { name: t('message.panel.settings.system.exit'), value: 'default' },
-  { name: t('message.panel.settings.system.minimize'), value: 'minimized' },
+  { name: 'message.panel.settings.system.exit', value: 'default' },
+  { name: 'message.panel.settings.system.minimize', value: 'minimized' },
 ];
 
 const settings = ref<Settings>({
@@ -59,8 +59,8 @@ function setOptions() {
   });
   save(option)
     .then(() => {
+      refresh.fetch = !refresh.fetch;
       onClose!();
-      refresh.fetch != refresh.fetch;
     })
     .catch((e) => console.log(e));
 }
@@ -132,8 +132,8 @@ onMounted(() => loadSettings());
                 :key="index"
                 :id="'system-radio-' + index"
                 name="system-radio"
-                :label="option.name"
-                :value="option.value"
+                :label="$t(option.name)"
+                :value="$t(option.value)"
                 :checked="option.value === removeQuotes(settings.close_mode)"
                 v-model:selected="settings.close_mode"
               />
