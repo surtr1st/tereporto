@@ -1,10 +1,9 @@
-use std::fs;
-
 use crate::{
     base::{Base, DirectoryControl},
+    constants::{TELEPORT_ARCHIVE_FOLDER, TELEPORT_KEY},
     hash_handler::HashHandler,
-    helpers::Constraint,
-    toml_handler::TOMLHandler, constants::{TELEPORT_ARCHIVE_FOLDER, TELEPORT_KEY},
+    helpers::{Constraint, retrieve_directory_files},
+    toml_handler::TOMLHandler,
 };
 use clap::Args;
 
@@ -65,32 +64,31 @@ impl Teleport {
             .get_recursive(TELEPORT_ARCHIVE_FOLDER)
             .get_base_directory();
 
-        'find_connected_teleport: for file in fs::read_dir(&dir).unwrap() {
-            let entry = file.unwrap();
-            let filename = entry.path().display().to_string();
+        let files: Vec<_> = retrieve_directory_files(&dir);
+
+        'find_connected_teleport: for file in files {
+            let filename = file.path().display().to_string();
             let content = handler.retrieve(&filename).read_content();
 
-            let section = content.get(TELEPORT_KEY);
-            if let Some(teleport) = section {
-                if let Some(t) = teleport.as_table() {
-                    let constraint = t.get("to");
-                    if constraint.is_none() {
-                        continue 'find_connected_teleport;
-                    }
-                    if constraint.is_some() {
-                        let valid_to = constraint.map(|value| value.to_string());
-                        teleports.push(Constraint {
-                            current_connect: valid_to.unwrap().to_string(),
-                            directory: t
-                                .get("directories")
-                                .unwrap()
-                                .as_array()
-                                .unwrap()
-                                .get(0)
-                                .unwrap()
-                                .to_string(),
-                        });
-                    }
+            let section = handler.get_content(&content, TELEPORT_KEY);
+            if let Ok(t) = section {
+                let constraint = t.get("to");
+                if constraint.is_none() {
+                    continue 'find_connected_teleport;
+                }
+                if constraint.is_some() {
+                    let valid_to = constraint.map(|value| value.to_string());
+                    teleports.push(Constraint {
+                        current_connect: valid_to.unwrap().to_string(),
+                        directory: t
+                            .get("directories")
+                            .unwrap()
+                            .as_array()
+                            .unwrap()
+                            .get(0)
+                            .unwrap()
+                            .to_string(),
+                    });
                 }
             }
         }

@@ -1,6 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod base;
+mod constants;
 mod event_watcher;
 mod hash_handler;
 mod helpers;
@@ -11,14 +12,15 @@ mod storage_cmd;
 mod teleport;
 mod teleport_cmd;
 mod toml_handler;
-mod constants;
 
 use base::{Base, DirectoryControl};
 use crossbeam_channel::unbounded;
 use event_watcher::watch;
 use helpers::{open_selected_directory, remove_quotes};
 use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
+use settings::{SystemSettings, SystemSettingsTrait};
 use settings_cmd::{load_settings, save_settings};
+use storage::Storage;
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -27,11 +29,10 @@ use std::time::Duration;
 use storage_cmd::{create_storage, get_storages, remove_storage, update_storage};
 use teleport::{Teleport, TeleportTarget};
 use teleport_cmd::{create_teleport, get_teleports, remove_teleport, update_teleport};
-use settings::{SystemSettings, SystemSettingsTrait};
 
 use tauri::{
-    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayEvent,
-    SystemTrayMenu, SystemTrayMenuItem,
+    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu,
+    SystemTrayMenuItem,
 };
 
 fn main() {
@@ -138,7 +139,7 @@ fn receive_connection() -> Vec<TeleportTarget> {
     let mut connection = vec![];
 
     let connected_teleports = Teleport::get_connected();
-    let storages = get_storages();
+    let storages = Storage::get_map();
 
     if connected_teleports.is_empty() {
         return connection;
@@ -146,13 +147,11 @@ fn receive_connection() -> Vec<TeleportTarget> {
 
     // Check if connected
     for t in &connected_teleports {
-        for s in &storages {
-            if t.current_connect == s.index {
-                connection.push(TeleportTarget {
-                    target: t.directory.clone(),
-                    destination: s.directory.clone(),
-                })
-            }
+        if storages.contains_key(&t.current_connect) {
+            connection.push(TeleportTarget {
+                target: t.directory.clone(),
+                destination: storages.get(&t.current_connect).unwrap().clone()
+            })
         }
     }
 

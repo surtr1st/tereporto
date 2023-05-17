@@ -1,12 +1,12 @@
-use std::path::Path;
 use crate::{
     base::{Base, DirectoryControl},
+    constants::SETTINGS_FILE,
     helpers::remove_quotes,
-    toml_handler::TOMLHandler, constants::SETTINGS_FILE,
+    toml_handler::TOMLHandler,
 };
+use std::path::Path;
 
-use tauri::{WindowEvent, RunEvent, GlobalWindowEvent, AppHandle};
-
+use tauri::{AppHandle, GlobalWindowEvent, RunEvent, WindowEvent};
 
 #[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Settings {
@@ -19,7 +19,6 @@ pub struct Settings {
 pub struct SettingsBox {
     pub settings: Settings,
 }
-
 
 impl Settings {
     pub fn load() -> Self {
@@ -56,7 +55,6 @@ impl Settings {
         }
     }
 }
-
 
 #[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct SystemSettings;

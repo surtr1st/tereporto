@@ -2,8 +2,9 @@ use std::collections::HashMap;
 
 use crate::{
     base::{Base, DirectoryControl},
+    constants::SETTINGS_FILE,
     settings::Settings,
-    toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs}, constants::SETTINGS_FILE,
+    toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs},
 };
 
 #[tauri::command]
