@@ -9,9 +9,9 @@ export function useStorage() {
       console.log(e);
     }
   };
-  const createStorage = async (s: Storage) => {
+  const createStorage = async (storages: Storage[]) => {
     try {
-      const result = await invoke<string>('create_storage', { s });
+      const result = await invoke<string>('create_storage', { storages });
       console.log(result);
     } catch (e) {
       console.log(e);

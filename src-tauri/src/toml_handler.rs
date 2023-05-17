@@ -1,3 +1,4 @@
+use crate::helpers::remove_quotes;
 use std::{fs, path::Path};
 
 #[derive(Debug, Default, Clone)]
@@ -77,12 +78,23 @@ impl TOMLHandler {
             let field = table.get_mut(target.to.field);
             if field.is_some() {
                 if let Some(f) = field {
-                    *f = toml::Value::from(target.to.value.to_string());
+                    match f {
+                        toml::Value::String(_) => {
+                            *f = toml::Value::from(remove_quotes(target.to.value));
+                        }
+                        toml::Value::Boolean(_) => {
+                            *f = toml::Value::from(target.to.value.parse::<bool>().unwrap());
+                        }
+                        toml::Value::Integer(_) => {
+                            *f = toml::Value::from(target.to.value.parse::<i64>().unwrap());
+                        }
+                        _ => {}
+                    }
                 }
             } else {
                 table.insert(
                     target.to.field.to_owned(),
-                    toml::Value::String(target.to.value.to_string()),
+                    toml::Value::from(target.to.value),
                 );
             }
 
@@ -100,6 +112,24 @@ impl TOMLHandler {
 
         // Write the updated TOML back to the file
         self.compose(&data)
+    }
+
+    pub fn remove_field(
+        &mut self,
+        content: &mut toml::Value,
+        key: &str,
+        field: &str,
+    ) -> Result<String, String> {
+        // Check if the key exists
+        if let Some(table) = content.get_mut(key).and_then(toml::Value::as_table_mut) {
+            // Remove the field if it exists
+            table.remove(field);
+        }
+
+        // Serialize the modified TOML back to a string
+        let updated =
+            toml::to_string_pretty(&content).expect("should be serialized the data back to string");
+        self.compose(&updated)
     }
 
     pub fn remove(&mut self, filename: &str) -> Result<String, String> {

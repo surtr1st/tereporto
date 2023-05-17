@@ -12,14 +12,28 @@ interface IFlex {
   alignItems?: 'center' | 'flex-start' | 'flex-end';
   gap?: number;
   column?: boolean;
+  marginTop?: number;
+  marginBottom?: number;
+  width?: number;
 }
-const { justifyContent, alignItems, gap, column } = defineProps<IFlex>();
+const {
+  justifyContent,
+  alignItems,
+  gap,
+  column,
+  marginTop,
+  marginBottom,
+  width,
+} = defineProps<IFlex>();
 
 const flexStyle: StyleValue = {
   'justify-content': justifyContent ?? 'center',
   'align-items': alignItems ?? 'center',
   'flex-direction': column ? 'column' : 'row',
   gap: `${gap}px`,
+  'margin-top': `${marginTop}px`,
+  'margin-bottom': `${marginBottom}px`,
+  width: `${width}px`,
 };
 </script>
 

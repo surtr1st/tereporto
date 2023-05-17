@@ -1,11 +1,6 @@
 <script lang="ts">
-import { onMounted, ref, watch } from 'vue';
-import { StorageResponse, TeleportResponse } from './types';
-import { useStorage, useTeleport } from './server';
-import { removeQuotes } from './helpers';
 import ConnectionPanel from './components/ConnectionPanel.vue';
 import Button from './components/Button.vue';
-import ButtonGroup from './components/ButtonGroup.vue';
 import Descriptive from './components/Descriptive.vue';
 import StoragePanel from './components/StoragePanel.vue';
 import TeleportPanel from './components/TeleportPanel.vue';
@@ -21,19 +16,28 @@ import FolderDestinationIcon from './components/Icon/FolderDestinationIcon.vue';
 import FolderTransferIcon from './components/Icon/FolderTransferIcon.vue';
 import TrashIcon from './components/Icon/TrashIcon.vue';
 import FunctionalPanel from './components/FunctionalPanel.vue';
-import Checkbox from './components/Checkbox.vue';
-import { useDirectoryControl } from './server/dir-control';
 import Modal from './components/Modal.vue';
 import ModalContent from './components/ModalContent.vue';
+import GearIcon from './components/Icon/GearIcon.vue';
+import FolderPathConnectIcon from './components/Icon/FolderPathConnectIcon.vue';
+import MapMarkerIcon from './components/Icon/MapMarkerIcon.vue';
+import DatabaseMarkerIcon from './components/Icon/DatabaseMarker.vue';
+import SettingsPanel from './components/SettingsPanel.vue';
+import { onMounted, ref, watch } from 'vue';
+import { StorageResponse, Teleport, TeleportResponse, Storage } from './types';
+import { useStorage, useTeleport, useDirectoryControl } from './server';
+import { removeQuotes } from './helpers';
 import { refresh } from './globals';
 </script>
 
 <script setup lang="ts">
-const open = ref<boolean>(false);
+const openConnection = ref<boolean>(false);
+const openSettings = ref<boolean>(false);
 const openDirs = ref<boolean>(false);
 const teleport = ref<string | string[]>('');
 const storage = ref<string | string[]>('');
 const teleports = ref<TeleportResponse[] | undefined>([]);
+const unconnectedTeleports = ref<TeleportResponse[] | undefined>([]);
 const storages = ref<StorageResponse[] | undefined>([]);
 const teleportDirs = ref<{ index: string; dirs: string[] }[]>([]);
 const { getTeleports, createTeleport, removeTeleport } = useTeleport();
@@ -42,7 +46,10 @@ const { openSelectedDir } = useDirectoryControl();
 
 function retrieveTeleports() {
   getTeleports()
-    .then((res) => (teleports.value = res))
+    .then((res) => {
+      teleports.value = res;
+      unconnectedTeleports.value = res?.filter((teleport) => !teleport.to);
+    })
     .catch((e) => console.log(e));
 }
 
@@ -55,36 +62,50 @@ function retrieveStorages() {
 function createNewTeleport() {
   // Get the last element which is the folder name
   const name = `${teleport.value}`.split('/').at(-1) as string;
-  let directories: string[] = [];
+  const teleports: Teleport[] = [];
 
-  if (Array.isArray(teleport.value)) directories = teleport.value;
-  else directories.push(teleport.value);
+  if (Array.isArray(teleport.value)) {
+    teleport.value.forEach((t) => {
+      const teleportName = `${t}`.split('/').at(-1) as string;
+      teleports.push({ name: teleportName, directory: t });
+    });
+  } else teleports.push({ name, directory: teleport.value });
 
-  createTeleport({ name, directories })
+  createTeleport(teleports)
     .then((rs) => console.log(rs))
     .catch((e) => console.log(e));
 }
 
 function createNewStorage() {
   const name = `${storage.value}`.split('/').at(-1) as string;
-  let directories: string[] = [];
+  const storages: Storage[] = [];
 
-  if (Array.isArray(storage.value)) directories = storage.value;
-  else directories.push(storage.value);
+  if (Array.isArray(storage.value)) {
+    storage.value.forEach((s) => {
+      const storageName = `${s}`.split('/').at(-1) as string;
+      storages.push({ name: storageName, directory: s });
+    });
+  } else storages.push({ name, directory: storage.value });
 
-  directories.forEach((directory) =>
-    createStorage({ name, directory })
-      .then((rs) => console.log(rs))
-      .catch((e) => console.log(e)),
-  );
+  createStorage(storages)
+    .then((rs) => console.log(rs))
+    .catch((e) => console.log(e));
+}
+
+function removeSelectedTeleport(index: string) {
+  removeTeleport(removeQuotes(index))
+    .then(() => (refresh.fetch = !refresh.fetch))
+    .catch((e) => console.log(e));
+}
+
+function removeSelectedStorage(index: string) {
+  removeStorage(removeQuotes(index))
+    .then(() => (refresh.fetch = !refresh.fetch))
+    .catch((e) => console.log(e));
 }
 
 function handleSelectedDirs(index: string) {
-  console.log(teleports.value);
-  const selected = teleports.value
-    ?.filter((t) => t.index === index)
-    .map((v) => v.directories);
-  console.log(selected);
+  teleports.value?.filter((t) => t.index === index).map((v) => v.directories);
   openDirs.value = true;
 }
 
@@ -122,7 +143,7 @@ onMounted(() => {
         align-items="center"
       >
         <TitleHeader
-          title="Teleported Folders"
+          :title="$t('message.header.teleport')"
           text-position="center"
         />
       </Flex>
@@ -133,7 +154,7 @@ onMounted(() => {
         align-items="center"
       >
         <TitleHeader
-          title="Storage Folders"
+          :title="$t('message.header.storage')"
           text-position="center"
         />
       </Flex>
@@ -166,7 +187,7 @@ onMounted(() => {
                 rounded
                 :name="'teleport-trash-btn-' + index"
                 color="danger"
-                @click="removeTeleport(removeQuotes(teleport.index))"
+                @click="removeSelectedTeleport(teleport.index)"
               >
                 <TrashIcon />
               </Button>
@@ -197,7 +218,7 @@ onMounted(() => {
                 rounded
                 :name="'storage-trash-btn-' + index"
                 color="danger"
-                @click="removeStorage(removeQuotes(storage.index))"
+                @click="removeSelectedStorage(storage.index)"
               >
                 <TrashIcon />
               </Button>
@@ -209,33 +230,47 @@ onMounted(() => {
     <GridItem position="footer">
       <Flex justify-content="center">
         <FunctionalPanel>
-          <Checkbox label="Start along side with OS" />
-          <Checkbox label="Auto-scan" />
           <DirectoryChooser
-            label="New Teleport"
+            :label="$t('message.feature.new_teleport')"
             name="teleport"
             v-model:select="teleport"
-          />
+          >
+            <MapMarkerIcon />
+          </DirectoryChooser>
           <DirectoryChooser
-            label="New Storage"
+            :label="$t('message.feature.new_storage')"
             name="storage"
             v-model:select="storage"
+          >
+            <DatabaseMarkerIcon />
+          </DirectoryChooser>
+          <Button
+            name="scan-btn"
+            :label="$t('message.feature.scan_teleport')"
+            color="darker"
+            rounded
+            larger
           />
-          <ButtonGroup>
-            <Button
-              name="scan-btn"
-              label="Scan Teleport"
-              color="darker"
-              larger
-            />
-            <Button
-              name="choose-btn"
-              label="Choose"
-              color="darker"
-              larger
-              @click="open = true"
-            />
-          </ButtonGroup>
+          <Button
+            name="connection-btn"
+            :label="$t('message.feature.connection')"
+            color="danger"
+            rounded
+            larger
+            icon
+            @click="openConnection = true"
+          >
+            <FolderPathConnectIcon />
+          </Button>
+          <Button
+            name="settings-btn"
+            color="darker"
+            rounded
+            icon
+            @click="openSettings = true"
+          >
+            <GearIcon />
+          </Button>
         </FunctionalPanel>
       </Flex>
     </GridItem>
@@ -252,10 +287,15 @@ onMounted(() => {
     </ModalContent>
   </Modal>
   <ConnectionPanel
-    :open="open"
-    title="Connection Panel"
-    :teleports="teleports"
+    :open="openConnection"
+    :title="$t('message.panel.connection.title')"
+    :teleports="unconnectedTeleports"
     :storages="storages"
-    @close="open = false"
+    @close="openConnection = false"
+  />
+  <SettingsPanel
+    :open="openSettings"
+    :title="$t('message.panel.settings.title')"
+    @close="openSettings = false"
   />
 </template>

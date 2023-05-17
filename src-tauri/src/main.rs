@@ -4,6 +4,8 @@ mod base;
 mod event_watcher;
 mod hash_handler;
 mod helpers;
+mod settings;
+mod settings_cmd;
 mod storage;
 mod storage_cmd;
 mod teleport;
@@ -14,7 +16,8 @@ use base::{Base, DirectoryControl};
 use crossbeam_channel::unbounded;
 use event_watcher::watch;
 use helpers::{open_selected_directory, remove_quotes};
-use notify::{RecursiveMode, RecommendedWatcher, Watcher, Config};
+use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
+use settings_cmd::{load_settings, save_settings};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -23,10 +26,11 @@ use std::time::Duration;
 use storage_cmd::{create_storage, get_storages, remove_storage, update_storage};
 use teleport::{Teleport, TeleportTarget};
 use teleport_cmd::{create_teleport, get_teleports, remove_teleport, update_teleport};
+use settings::{SystemSettings, SystemSettingsTrait};
 
 use tauri::{
-    AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, RunEvent, SystemTray, SystemTrayEvent,
-    SystemTrayMenu, SystemTrayMenuItem, WindowEvent,
+    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayEvent,
+    SystemTrayMenu, SystemTrayMenuItem,
 };
 
 fn main() {
@@ -64,15 +68,11 @@ fn main() {
                             .with_poll_interval(Duration::from_secs(2))
                             .with_compare_contents(true);
                         // Create a file system watcher
-                        let mut watcher: RecommendedWatcher =
-                        Watcher::new(tx, config).unwrap();
+                        let mut watcher: RecommendedWatcher = Watcher::new(tx, config).unwrap();
 
                         watcher
-                            .watch(
-                                &PathBuf::from(&target),
-                                RecursiveMode::Recursive,
-                            )
-                            .unwrap(); 
+                            .watch(&PathBuf::from(&target), RecursiveMode::Recursive)
+                            .unwrap();
 
                         std::thread::sleep(std::time::Duration::from_secs(1));
                         watch(rx, map_inner_clone);
@@ -92,7 +92,7 @@ fn main() {
     tauri::Builder::default()
         .system_tray(create_system_tray())
         .on_system_tray_event(handle_system_tray)
-        .on_window_event(prevent_frontend_on_close)
+        .on_window_event(SystemSettings::prevent_frontend_on_close)
         .invoke_handler(tauri::generate_handler![
             get_storages,
             create_storage,
@@ -102,11 +102,13 @@ fn main() {
             update_teleport,
             open_selected_directory,
             remove_teleport,
-            remove_storage
+            remove_storage,
+            load_settings,
+            save_settings
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
-        .run(prevent_backend_on_close)
+        .run(SystemSettings::prevent_backend_on_close)
 }
 
 fn create_system_tray() -> SystemTray {
@@ -132,19 +134,6 @@ fn handle_system_tray(app: &AppHandle, event: SystemTrayEvent) {
             }
             _ => {}
         }
-    }
-}
-
-fn prevent_frontend_on_close(event: GlobalWindowEvent) {
-    if let WindowEvent::CloseRequested { api, .. } = event.event() {
-        event.window().hide().unwrap();
-        api.prevent_close();
-    }
-}
-
-fn prevent_backend_on_close(_app: &AppHandle, event: RunEvent) {
-    if let RunEvent::ExitRequested { api, .. } = event {
-        api.prevent_exit();
     }
 }
 
