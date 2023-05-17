@@ -26,10 +26,11 @@ use std::time::Duration;
 use storage_cmd::{create_storage, get_storages, remove_storage, update_storage};
 use teleport::{Teleport, TeleportTarget};
 use teleport_cmd::{create_teleport, get_teleports, remove_teleport, update_teleport};
+use settings::{SystemSettings, SystemSettingsTrait};
 
 use tauri::{
-    AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, RunEvent, SystemTray, SystemTrayEvent,
-    SystemTrayMenu, SystemTrayMenuItem, WindowEvent,
+    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayEvent,
+    SystemTrayMenu, SystemTrayMenuItem,
 };
 
 fn main() {
@@ -91,7 +92,7 @@ fn main() {
     tauri::Builder::default()
         .system_tray(create_system_tray())
         .on_system_tray_event(handle_system_tray)
-        .on_window_event(prevent_frontend_on_close)
+        .on_window_event(SystemSettings::prevent_frontend_on_close)
         .invoke_handler(tauri::generate_handler![
             get_storages,
             create_storage,
@@ -107,7 +108,7 @@ fn main() {
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
-        .run(prevent_backend_on_close)
+        .run(SystemSettings::prevent_backend_on_close)
 }
 
 fn create_system_tray() -> SystemTray {
@@ -133,19 +134,6 @@ fn handle_system_tray(app: &AppHandle, event: SystemTrayEvent) {
             }
             _ => {}
         }
-    }
-}
-
-fn prevent_frontend_on_close(event: GlobalWindowEvent) {
-    if let WindowEvent::CloseRequested { api, .. } = event.event() {
-        event.window().hide().unwrap();
-        api.prevent_close();
-    }
-}
-
-fn prevent_backend_on_close(_app: &AppHandle, event: RunEvent) {
-    if let RunEvent::ExitRequested { api, .. } = event {
-        api.prevent_exit();
     }
 }
 

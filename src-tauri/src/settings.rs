@@ -1,9 +1,12 @@
 use std::path::Path;
 use crate::{
     base::{Base, DirectoryControl},
-    helpers::SETTINGS_FILE,
+    helpers::{SETTINGS_FILE, remove_quotes},
     toml_handler::TOMLHandler,
 };
+
+use tauri::{WindowEvent, RunEvent, GlobalWindowEvent, AppHandle};
+
 
 #[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Settings {
@@ -16,6 +19,7 @@ pub struct Settings {
 pub struct SettingsBox {
     pub settings: Settings,
 }
+
 
 impl Settings {
     pub fn load() -> Self {
@@ -49,6 +53,36 @@ impl Settings {
             auto_scan,
             preferred_lang,
             close_mode,
+        }
+    }
+}
+
+
+#[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]
+pub struct SystemSettings;
+
+pub trait SystemSettingsTrait {
+    fn prevent_frontend_on_close(event: GlobalWindowEvent);
+    fn prevent_backend_on_close(app: &AppHandle, event: RunEvent);
+}
+
+impl SystemSettingsTrait for SystemSettings {
+    fn prevent_frontend_on_close(event: GlobalWindowEvent) {
+        let close_mode = remove_quotes(&Settings::load().close_mode);
+        if close_mode == "minimized" {
+            if let WindowEvent::CloseRequested { api, .. } = event.event() {
+                event.window().hide().unwrap();
+                api.prevent_close();
+            }
+        }
+    }
+
+    fn prevent_backend_on_close(_app: &AppHandle, event: RunEvent) {
+        let close_mode = remove_quotes(&Settings::load().close_mode);
+        if close_mode == "minimized" {
+            if let RunEvent::ExitRequested { api, .. } = event {
+                api.prevent_exit();
+            }
         }
     }
 }

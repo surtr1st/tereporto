@@ -10,7 +10,7 @@ interface ICheckbox {
   style?: StyleValue;
 }
 defineProps<ICheckbox>();
-defineEmits(['update:selected']);
+defineEmits(['update:checked']);
 </script>
 
 <template>

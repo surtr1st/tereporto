@@ -21,7 +21,7 @@ interface IConnectionPanel {
 }
 const { onClose } = defineProps<IConnectionPanel>();
 const { load, save } = useSettings();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const langs = [
   { name: 'VI', value: 'vi' },
@@ -42,7 +42,12 @@ const settings = ref<Settings>({
 
 function loadSettings() {
   load()
-    .then((res) => (settings.value = res!))
+    .then((res) => {
+      if (res) {
+        settings.value = res;
+        locale.value = removeQuotes(res.preferred_lang);
+      }
+    })
     .catch((e) => console.log(e));
 }
 
@@ -50,8 +55,9 @@ function setOptions() {
   const option = new Map<string, string>();
   Object.entries(settings.value).forEach(([key, value]) => {
     if (typeof value === 'string') option.set(key, `${removeQuotes(value)}`);
-    else option.set(key, `${!value}`);
+    else option.set(key, `${value ?? false}`);
   });
+  console.log(option);
   save(option)
     .then(() => {
       onClose!();
@@ -66,6 +72,11 @@ watch(
     loadSettings();
   },
 );
+
+watch(locale, (newLocale, oldLocale) => {
+  if (!newLocale) return;
+  loadSettings();
+});
 
 onMounted(() => loadSettings());
 </script>
@@ -92,9 +103,8 @@ onMounted(() => loadSettings());
             <Checkbox
               id="auto-scan-checkbox"
               :label="$t('message.panel.settings.auto.scan')"
-              :checked="settings.auto_scan"
               :value="settings.auto_scan"
-              v-model:selected="settings.auto_scan"
+              v-model:checked="settings.auto_scan"
             />
           </PlaceHolder>
           <PlaceHolder :title="$t('message.panel.settings.lang.title')">
