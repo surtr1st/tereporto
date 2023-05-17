@@ -24,7 +24,7 @@ import MapMarkerIcon from './components/Icon/MapMarkerIcon.vue';
 import DatabaseMarkerIcon from './components/Icon/DatabaseMarker.vue';
 import SettingsPanel from './components/SettingsPanel.vue';
 import { onMounted, ref, watch } from 'vue';
-import { StorageResponse, TeleportResponse } from './types';
+import { StorageResponse, Teleport, TeleportResponse, Storage } from './types';
 import { useStorage, useTeleport, useDirectoryControl } from './server';
 import { removeQuotes } from './helpers';
 import { refresh } from './globals';
@@ -37,6 +37,7 @@ const openDirs = ref<boolean>(false);
 const teleport = ref<string | string[]>('');
 const storage = ref<string | string[]>('');
 const teleports = ref<TeleportResponse[] | undefined>([]);
+const unconnectedTeleports = ref<TeleportResponse[] | undefined>([]);
 const storages = ref<StorageResponse[] | undefined>([]);
 const teleportDirs = ref<{ index: string; dirs: string[] }[]>([]);
 const { getTeleports, createTeleport, removeTeleport } = useTeleport();
@@ -45,7 +46,10 @@ const { openSelectedDir } = useDirectoryControl();
 
 function retrieveTeleports() {
   getTeleports()
-    .then((res) => (teleports.value = res))
+    .then((res) => {
+      teleports.value = res;
+      unconnectedTeleports.value = res?.filter((teleport) => !teleport.to);
+    })
     .catch((e) => console.log(e));
 }
 
@@ -58,28 +62,34 @@ function retrieveStorages() {
 function createNewTeleport() {
   // Get the last element which is the folder name
   const name = `${teleport.value}`.split('/').at(-1) as string;
-  let directories: string[] = [];
+  const teleports: Teleport[] = [];
 
-  if (Array.isArray(teleport.value)) directories = teleport.value;
-  else directories.push(teleport.value);
+  if (Array.isArray(teleport.value)) {
+    teleport.value.forEach((t) => {
+      const teleportName = `${t}`.split('/').at(-1) as string;
+      teleports.push({ name: teleportName, directory: t });
+    });
+  } else teleports.push({ name, directory: teleport.value });
 
-  createTeleport({ name, directories })
+  createTeleport(teleports)
     .then((rs) => console.log(rs))
     .catch((e) => console.log(e));
 }
 
 function createNewStorage() {
   const name = `${storage.value}`.split('/').at(-1) as string;
-  let directories: string[] = [];
+  const storages: Storage[] = [];
 
-  if (Array.isArray(storage.value)) directories = storage.value;
-  else directories.push(storage.value);
+  if (Array.isArray(storage.value)) {
+    storage.value.forEach((s) => {
+      const storageName = `${s}`.split('/').at(-1) as string;
+      storages.push({ name: storageName, directory: s });
+    });
+  } else storages.push({ name, directory: storage.value });
 
-  directories.forEach((directory) =>
-    createStorage({ name, directory })
-      .then((rs) => console.log(rs))
-      .catch((e) => console.log(e)),
-  );
+  createStorage(storages)
+    .then((rs) => console.log(rs))
+    .catch((e) => console.log(e));
 }
 
 function removeSelectedTeleport(index: string) {
@@ -279,7 +289,7 @@ onMounted(() => {
   <ConnectionPanel
     :open="openConnection"
     :title="$t('message.panel.connection.title')"
-    :teleports="teleports"
+    :teleports="unconnectedTeleports"
     :storages="storages"
     @close="openConnection = false"
   />

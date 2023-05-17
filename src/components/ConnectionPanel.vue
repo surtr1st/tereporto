@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import Flex from './Flex.vue';
-import Grid from './Grid.vue';
-import GridItem from './GridItem.vue';
 import Button from './Button.vue';
 import RadioButton from './RadioButton.vue';
 import Modal from './Modal.vue';

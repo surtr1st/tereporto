@@ -1,6 +1,6 @@
 export type Teleport = {
   name: string;
-  directories?: string[];
+  directory?: string;
   to?: string;
   color?: string;
 };

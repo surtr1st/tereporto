@@ -49,7 +49,7 @@ pub fn get_teleports() -> Vec<Teleport> {
 }
 
 #[tauri::command]
-pub fn create_teleport(t: TeleportArgs) -> Result<String, String> {
+pub fn create_teleport(teleports: Vec<TeleportArgs>) -> Result<String, String> {
     let mut handler = TOMLHandler::default();
 
     let mut base = Base::init_path();
@@ -58,17 +58,22 @@ pub fn create_teleport(t: TeleportArgs) -> Result<String, String> {
         .get_recursive(TELEPORT_ARCHIVE_FOLDER)
         .get_base_directory();
 
-    // Hashing and take this as filename
-    let hasher = HashHandler::encrypt(&t.name);
+    teleports
+        .iter()
+        .for_each(|t| {
+            // Hashing and take this as filename
+            let hasher = HashHandler::encrypt(&t.name);
+            handler
+                .create_file(&dir, &hasher)
+                .compose(&Teleport::serialize(NewTeleport {
+                    name: &t.name,
+                    directories: &vec![t.directory.clone()],
+                    to: t.to.clone(),
+                    color: t.color.clone(),
+                })).unwrap();
+        });
 
-    handler
-        .create_file(&dir, &hasher)
-        .compose(&Teleport::serialize(NewTeleport {
-            name: &t.name,
-            directories: &t.directories,
-            to: t.to,
-            color: t.color,
-        }))
+    Ok(String::from("Created teleport successfully!"))
 }
 
 #[tauri::command]
@@ -111,7 +116,12 @@ pub fn remove_teleport(filename: String) -> Result<String, String> {
         let section = content.get("storage");
         if let Some(storage) = section {
             if let Some(s) = storage.as_table() {
-                let constraint = remove_quotes(&s.get("constraint").unwrap().to_string());
+                let constraint_field = s.get("constraint");
+                if constraint_field.is_none() {
+                    continue;
+                }
+
+                let constraint = remove_quotes(&constraint_field.unwrap().to_string());
                 if *constraint == *filename {
                     handler
                         .remove_field(&mut content, "storage", "constraint")
