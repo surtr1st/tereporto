@@ -4,6 +4,8 @@ mod base;
 mod event_watcher;
 mod hash_handler;
 mod helpers;
+mod settings;
+mod settings_cmd;
 mod storage;
 mod storage_cmd;
 mod teleport;
@@ -14,7 +16,9 @@ use base::{Base, DirectoryControl};
 use crossbeam_channel::unbounded;
 use event_watcher::watch;
 use helpers::{open_selected_directory, remove_quotes};
-use notify::*;
+use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
+use settings_cmd::{load_settings, save_settings};
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -22,10 +26,11 @@ use std::time::Duration;
 use storage_cmd::{create_storage, get_storages, remove_storage, update_storage};
 use teleport::{Teleport, TeleportTarget};
 use teleport_cmd::{create_teleport, get_teleports, remove_teleport, update_teleport};
+use settings::{SystemSettings, SystemSettingsTrait};
 
 use tauri::{
-    AppHandle, CustomMenuItem, GlobalWindowEvent, Manager, RunEvent, SystemTray, SystemTrayEvent,
-    SystemTrayMenu, SystemTrayMenuItem, WindowEvent,
+    AppHandle, CustomMenuItem, Manager, SystemTray, SystemTrayEvent,
+    SystemTrayMenu, SystemTrayMenuItem,
 };
 
 fn main() {
@@ -34,48 +39,60 @@ fn main() {
     let (tx, rx) = unbounded();
     let rx_arc = Arc::new(Mutex::new(rx));
 
-    tauri::Builder::default()
-        .setup(|_| {
-            tauri::async_runtime::spawn(async move {
-                loop {
-                    let connection = receive_connection();
-                    if !connection.is_empty() {
-                        std::thread::sleep(std::time::Duration::from_secs(2));
-                        // Create a file system watcher
-                        let watcher_config = Config::default()
+    tauri::async_runtime::spawn(async move {
+        let map = Arc::new(Mutex::new(HashMap::<String, String>::default()));
+        loop {
+            let connection = receive_connection();
+            if !connection.is_empty() {
+                let mut threads = vec![];
+                // Handle each watcher
+                for c in connection {
+                    let tx_clone = tx.clone();
+                    let rx_clone = Arc::clone(&rx_arc);
+                    let target = remove_quotes(&c.target);
+                    let destination = remove_quotes(&c.destination);
+
+                    let map_clone = Arc::clone(&map);
+                    map_clone
+                        .lock()
+                        .unwrap()
+                        .insert(target.clone(), destination.clone());
+
+                    let thread_watcher = std::thread::spawn(move || {
+                        let tx = tx_clone;
+                        let rx = rx_clone;
+                        let target = target;
+                        let map_inner_clone = Arc::clone(&map_clone);
+
+                        let config = Config::default()
                             .with_poll_interval(Duration::from_secs(2))
                             .with_compare_contents(true);
+                        // Create a file system watcher
+                        let mut watcher: RecommendedWatcher = Watcher::new(tx, config).unwrap();
 
-                        let mut watcher: RecommendedWatcher =
-                            Watcher::new(tx.clone(), watcher_config).unwrap();
+                        watcher
+                            .watch(&PathBuf::from(&target), RecursiveMode::Recursive)
+                            .unwrap();
 
-                        // Start watching the folder for events
-                        for c in connection {
-                            println!("{}", &c.target);
-                            watcher
-                                .watch(
-                                    &PathBuf::from(remove_quotes(&c.target)),
-                                    RecursiveMode::Recursive,
-                                )
-                                .unwrap();
-
-                            println!("Monitoring folder for file additions: {}", &c.target);
-                            watch(
-                                Arc::clone(&rx_arc),
-                                &remove_quotes(&c.target),
-                                &remove_quotes(&c.destination),
-                            );
-                        }
-                    }
-                    // Delay or sleep for a certain period before the next iteration
-                    std::thread::sleep(std::time::Duration::from_secs(1));
+                        std::thread::sleep(std::time::Duration::from_secs(1));
+                        watch(rx, map_inner_clone);
+                    });
+                    threads.push(thread_watcher);
                 }
-            });
-            Ok(())
-        })
+
+                for th in threads {
+                    th.join().unwrap();
+                }
+            }
+            // Delay or sleep for a certain period before the next iteration
+            std::thread::sleep(std::time::Duration::from_secs(1));
+        }
+    });
+
+    tauri::Builder::default()
         .system_tray(create_system_tray())
         .on_system_tray_event(handle_system_tray)
-        .on_window_event(prevent_frontend_on_close)
+        .on_window_event(SystemSettings::prevent_frontend_on_close)
         .invoke_handler(tauri::generate_handler![
             get_storages,
             create_storage,
@@ -85,11 +102,13 @@ fn main() {
             update_teleport,
             open_selected_directory,
             remove_teleport,
-            remove_storage
+            remove_storage,
+            load_settings,
+            save_settings
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
-        .run(prevent_backend_on_close)
+        .run(SystemSettings::prevent_backend_on_close)
 }
 
 fn create_system_tray() -> SystemTray {
@@ -115,19 +134,6 @@ fn handle_system_tray(app: &AppHandle, event: SystemTrayEvent) {
             }
             _ => {}
         }
-    }
-}
-
-fn prevent_frontend_on_close(event: GlobalWindowEvent) {
-    if let WindowEvent::CloseRequested { api, .. } = event.event() {
-        event.window().hide().unwrap();
-        api.prevent_close();
-    }
-}
-
-fn prevent_backend_on_close(_app: &AppHandle, event: RunEvent) {
-    if let RunEvent::ExitRequested { api, .. } = event {
-        api.prevent_exit();
     }
 }
 

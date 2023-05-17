@@ -1,6 +1,6 @@
 export type Teleport = {
   name: string;
-  directories?: string[];
+  directory?: string;
   to?: string;
   color?: string;
 };
@@ -42,3 +42,9 @@ export type UpdateArgs = {
 
 export type TeleportUpdateArgs = UpdateArgs;
 export type StorageUpdateArgs = UpdateArgs;
+
+export type Settings = {
+  auto_scan: boolean;
+  preferred_lang: string;
+  close_mode: string;
+};

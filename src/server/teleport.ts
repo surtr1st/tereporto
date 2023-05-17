@@ -10,9 +10,9 @@ export function useTeleport() {
     }
   };
 
-  const createTeleport = async (t: Teleport) => {
+  const createTeleport = async (teleports: Teleport[]) => {
     try {
-      const result = await invoke<string>('create_teleport', { t });
+      const result = await invoke<string>('create_teleport', { teleports });
       console.log(result);
     } catch (e) {
       console.log(e);

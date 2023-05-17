@@ -1,0 +1,38 @@
+{
+  "header": {
+    "teleport": "Thư mục dịch chuyển",
+    "storage": "Thư mục lưu trữ"
+  },
+  "feature": {
+    "new_teleport": "Tạo mốc dịch chuyển",
+    "new_storage": "Tạo mốc lưu trữ",
+    "scan_teleport": "Quét mốc dịch chuyển",
+    "connection": "Ràng buộc",
+    "save": "Lưu lại"
+  },
+  "panel": {
+    "connection": {
+      "title": "Bảng ràng buộc",
+      "teleports": "Mốc dịch chuyển",
+      "storages": "Mốc lưu trữ"
+    },
+    "settings": {
+      "title": "Cài đặt",
+      "auto": {
+        "title": "Tự dộng quét vị trí của mốc dịch chuyển",
+        "scan": "Tự dộng"
+      },
+      "lang": {
+        "title": "Ngôn ngữ ưa thích để hiển thị",
+        "vi": "VI",
+        "en": "EN",
+        "ja": "JP"
+      },
+      "system": {
+        "title": "Hệ thống",
+        "exit": "Thoát khỏi ứng dụng khi tắt",
+        "minimize": "Thu nhỏ vào khay"
+      }
+    }
+  }
+}

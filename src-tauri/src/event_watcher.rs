@@ -2,40 +2,35 @@ use crossbeam_channel::Receiver;
 use notify::event::CreateKind;
 use notify::*;
 use rayon::prelude::*;
+use std::collections::HashMap;
 use std::fs;
 use std::sync::{Arc, Mutex};
 
+use crate::helpers::retrieve_directory_content;
+
 pub fn watch(
     rx: Arc<Mutex<Receiver<std::result::Result<Event, Error>>>>,
-    target: &str,
-    dest: &str,
+    map: Arc<Mutex<HashMap<String, String>>>,
 ) {
     // Process events
     loop {
         match rx.lock().unwrap().recv() {
-            Ok(event) => {
-                if let Ok(evt) = event {
-                    let file = CreateKind::File;
-                    let folder = CreateKind::Folder;
-                    if evt.kind == EventKind::Create(file) || evt.kind == EventKind::Create(folder)
-                    {
-                        for path in &evt.paths {
-                            if let Some(file_name) = path.file_name() {
-                                println!("File added: {:?}", file_name);
-                            }
-                            if path.is_dir() {
-                                println!("Folder added: {}", path.display());
-                            }
-                        }
+            Ok(Ok(evt)) => {
+                let file = CreateKind::File;
+                let folder = CreateKind::Folder;
+                if evt.kind == EventKind::Create(file) || evt.kind == EventKind::Create(folder) {
+                    let paths = evt.paths.first().unwrap();
+                    let display = paths.display().to_string();
+                    let hash_map = map.lock().unwrap();
+                    let mut parts = display.split('/').collect::<Vec<_>>();
+                    parts.pop().unwrap();
+                    let target_dir = parts.join("/");
 
-                        let teleport_dir_target = fs::read_dir(target)
-                            .expect("should read the directory specified!")
-                            .map(|entry| entry.unwrap().path())
-                            .filter(|path| path.is_file() || path.is_dir())
-                            .collect::<Vec<_>>();
-
+                    if hash_map.contains_key(&target_dir) {
+                        let dest = hash_map.get(&target_dir).unwrap();
+                        let target_teleport_dir = retrieve_directory_content(&target_dir);
                         // Use Rayon to parallelize the file transfer
-                        teleport_dir_target.par_iter().for_each(|file| {
+                        target_teleport_dir.par_iter().for_each(|file| {
                             let filename = file.file_name().unwrap_or_else(|| {
                                 panic!("should return file: {}", file.to_str().unwrap())
                             });
@@ -47,8 +42,13 @@ pub fn watch(
                     }
                 }
             }
+            Ok(Err(e)) => {
+                eprintln!("Received error event: {:?}", e);
+                break;
+            }
             Err(e) => {
                 eprintln!("Error receiving event: {:?}", e);
+                break;
             }
         }
     }

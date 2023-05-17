@@ -1,22 +1,32 @@
 <script setup lang="ts">
+import { StyleValue } from 'vue';
+
 interface ICheckbox {
+  id?: string;
   name?: string;
   label?: string;
+  value?: boolean;
   checked?: boolean;
+  style?: StyleValue;
 }
 defineProps<ICheckbox>();
+defineEmits(['update:checked']);
 </script>
 
 <template>
   <label
-    :for="name"
+    :for="id"
     class="tp__checkbox-label"
+    :style="style"
   >
     {{ label }}
     <input
+      :id="id"
       type="checkbox"
       :checked="checked"
       :name="name"
+      :value="value"
+      @click="$emit('update:checked', value)"
     />
     <span class="tp__checkmark"></span>
   </label>
@@ -35,6 +45,7 @@ defineProps<ICheckbox>();
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  color: white;
   background: inherit;
 }
 
@@ -55,7 +66,7 @@ defineProps<ICheckbox>();
   height: 24px;
   width: 24px;
   border-radius: 50%;
-  background: var(--darker-neutral);
+  background: var(--light-neutral-gray);
   transition: all 150ms;
 }
 

@@ -1,4 +1,6 @@
 #![allow(dead_code, unused)]
+use std::{fs, path::PathBuf};
+
 use crate::{
     base::{Base, DirectoryControl},
     hash_handler::HashHandler,
@@ -8,6 +10,7 @@ use regex::Regex;
 
 pub const TELEPORT_ARCHIVE_FOLDER: &str = "teleports";
 pub const STORAGE_ARCHIVE_FOLDER: &str = "storages";
+pub const SETTINGS_FILE: &str = "settings";
 
 pub struct ConnectionBetween<'cb> {
     pub teleport_index: &'cb str,
@@ -68,4 +71,12 @@ pub fn has_connected(c: ConnectionBetween) -> bool {
 pub fn remove_quotes(target: &str) -> String {
     let regex = Regex::new("\"").unwrap();
     format!("{}", regex.replace_all(target, ""))
+}
+
+pub fn retrieve_directory_content(dir: &str) -> Vec<PathBuf> {
+    fs::read_dir(dir)
+        .expect("should read the directory specified!")
+        .map(|entry| entry.unwrap().path())
+        .filter(|path| path.is_file() || path.is_dir())
+        .collect::<Vec<_>>()
 }

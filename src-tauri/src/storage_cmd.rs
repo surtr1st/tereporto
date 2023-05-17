@@ -1,6 +1,6 @@
 use crate::base::{Base, DirectoryControl};
 use crate::hash_handler::HashHandler;
-use crate::helpers::{STORAGE_ARCHIVE_FOLDER, TELEPORT_ARCHIVE_FOLDER};
+use crate::helpers::{remove_quotes, STORAGE_ARCHIVE_FOLDER, TELEPORT_ARCHIVE_FOLDER};
 use crate::storage::{NewStorage, Storage, StorageArgs};
 use crate::toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs};
 use std::fs;
@@ -42,7 +42,7 @@ pub fn get_storages() -> Vec<Storage> {
 }
 
 #[tauri::command]
-pub fn create_storage(s: StorageArgs) -> Result<String, String> {
+pub fn create_storage(storages: Vec<StorageArgs>) -> Result<String, String> {
     let mut handler = TOMLHandler::default();
 
     let mut base = Base::init_path();
@@ -50,18 +50,23 @@ pub fn create_storage(s: StorageArgs) -> Result<String, String> {
         .create_recursive(STORAGE_ARCHIVE_FOLDER)
         .get_recursive(STORAGE_ARCHIVE_FOLDER)
         .get_base_directory();
+ 
+    storages
+        .iter()
+        .for_each(|s| {
+            // Hashing and take this as filename
+            let hasher = HashHandler::encrypt(&s.name);
+            handler
+                .create_file(&dir, &hasher)
+                .compose(&Storage::serialize(NewStorage {
+                    name: &s.name,
+                    directory: &s.directory,
+                    constraint: s.constraint.clone(),
+                    color: s.color.clone(),
+                })).unwrap();
+        });
 
-    // Hashing and take this as filename
-    let hasher = HashHandler::encrypt(&s.name);
-
-    handler
-        .create_file(&dir, &hasher)
-        .compose(&Storage::serialize(NewStorage {
-            name: &s.name,
-            directory: &s.directory,
-            constraint: s.constraint,
-            color: s.color,
-        }))
+    Ok(String::from("Created storage successfully!"))
 }
 
 #[tauri::command]
@@ -104,28 +109,19 @@ pub fn remove_storage(filename: String) -> Result<String, String> {
         let section = content.get("teleports");
         if let Some(teleport) = section {
             if let Some(t) = teleport.as_table() {
-                let constraint = t.get("to").unwrap().to_string();
+                let constraint_field = t.get("to");
+                if constraint_field.is_none() {
+                    continue;
+                }
+
+                let constraint = remove_quotes(&constraint_field.unwrap().to_string());
                 if *constraint == *filename {
-                    handler.update(
-                        &mut content,
-                        TOMLUpdateArgs {
-                            key: "teleports",
-                            to: MappedField {
-                                field: "to",
-                                value: "",
-                            },
-                        },
-                    )?;
-                    handler.update(
-                        &mut content,
-                        TOMLUpdateArgs {
-                            key: "teleports",
-                            to: MappedField {
-                                field: "color",
-                                value: "",
-                            },
-                        },
-                    )?;
+                    handler
+                        .remove_field(&mut content, "teleports", "to")
+                        .unwrap();
+                    handler
+                        .remove_field(&mut content, "teleports", "color")
+                        .unwrap();
                 }
             }
         }

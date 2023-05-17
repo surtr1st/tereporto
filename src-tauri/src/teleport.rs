@@ -25,7 +25,7 @@ pub struct TeleportBox {
 #[derive(Args, serde::Serialize, serde::Deserialize)]
 pub struct TeleportArgs {
     pub name: String,
-    pub directories: Vec<String>,
+    pub directory: String,
     pub to: Option<String>,
     pub color: Option<String>,
 }
