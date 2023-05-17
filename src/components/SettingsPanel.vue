@@ -5,10 +5,10 @@ import RadioButton from './RadioButton.vue';
 import Modal from './Modal.vue';
 import ModalContent from './ModalContent.vue';
 import ModalFooter from './ModalFooter.vue';
-import { onMounted, ref, watch } from 'vue';
-import { refresh } from '../globals';
 import Checkbox from './Checkbox.vue';
 import PlaceHolder from './PlaceHolder.vue';
+import { onMounted, ref, watch } from 'vue';
+import { refresh } from '../globals';
 import { useSettings } from '../server';
 import { Settings } from '../types';
 import { removeQuotes } from '../helpers';
@@ -55,9 +55,8 @@ function setOptions() {
   const option = new Map<string, string>();
   Object.entries(settings.value).forEach(([key, value]) => {
     if (typeof value === 'string') option.set(key, `${removeQuotes(value)}`);
-    else option.set(key, `${value ?? false}`);
+    else option.set(key, `${value}`);
   });
-  console.log(option);
   save(option)
     .then(() => {
       onClose!();
@@ -72,11 +71,6 @@ watch(
     loadSettings();
   },
 );
-
-watch(locale, (newLocale, oldLocale) => {
-  if (!newLocale) return;
-  loadSettings();
-});
 
 onMounted(() => loadSettings());
 </script>
@@ -103,7 +97,7 @@ onMounted(() => loadSettings());
             <Checkbox
               id="auto-scan-checkbox"
               :label="$t('message.panel.settings.auto.scan')"
-              :value="settings.auto_scan"
+              :value="!settings.auto_scan ? true : false"
               v-model:checked="settings.auto_scan"
             />
           </PlaceHolder>

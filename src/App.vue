@@ -125,10 +125,8 @@ watch(
   () => refresh.fetch,
   (newValue, _oldValue) => {
     console.log(newValue, _oldValue);
-    if (newValue !== _oldValue) {
-      retrieveTeleports();
-      retrieveStorages();
-    }
+    retrieveTeleports();
+    retrieveStorages();
   },
 );
 

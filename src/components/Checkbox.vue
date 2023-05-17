@@ -26,7 +26,7 @@ defineEmits(['update:checked']);
       :checked="checked"
       :name="name"
       :value="value"
-      @click="$emit('update:selected', value)"
+      @click="$emit('update:checked', value)"
     />
     <span class="tp__checkmark"></span>
   </label>
