@@ -3,8 +3,8 @@ use std::fs;
 use crate::{
     base::{Base, DirectoryControl},
     hash_handler::HashHandler,
-    helpers::{Constraint, TELEPORT_ARCHIVE_FOLDER},
-    toml_handler::TOMLHandler,
+    helpers::Constraint,
+    toml_handler::TOMLHandler, constants::{TELEPORT_ARCHIVE_FOLDER, TELEPORT_KEY},
 };
 use clap::Args;
 
@@ -19,7 +19,7 @@ pub struct Teleport {
 
 #[derive(Debug, Default, serde::Serialize)]
 pub struct TeleportBox {
-    pub teleports: Teleport,
+    pub teleport: Teleport,
 }
 
 #[derive(Args, serde::Serialize, serde::Deserialize)]
@@ -47,7 +47,7 @@ pub struct TeleportTarget {
 impl Teleport {
     pub fn serialize(t: NewTeleport) -> String {
         let teleport = TeleportBox {
-            teleports: Teleport {
+            teleport: Teleport {
                 index: HashHandler::encrypt(t.name),
                 name: t.name.to_string(),
                 directories: t.directories.to_vec(),
@@ -70,7 +70,7 @@ impl Teleport {
             let filename = entry.path().display().to_string();
             let content = handler.retrieve(&filename).read_content();
 
-            let section = content.get("teleports");
+            let section = content.get(TELEPORT_KEY);
             if let Some(teleport) = section {
                 if let Some(t) = teleport.as_table() {
                     let constraint = t.get("to");

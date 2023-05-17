@@ -4,13 +4,10 @@ use std::{fs, path::PathBuf};
 use crate::{
     base::{Base, DirectoryControl},
     hash_handler::HashHandler,
-    toml_handler::TOMLHandler,
+    toml_handler::TOMLHandler, constants::TELEPORT_ARCHIVE_FOLDER,
 };
 use regex::Regex;
 
-pub const TELEPORT_ARCHIVE_FOLDER: &str = "teleports";
-pub const STORAGE_ARCHIVE_FOLDER: &str = "storages";
-pub const SETTINGS_FILE: &str = "settings";
 
 pub struct ConnectionBetween<'cb> {
     pub teleport_index: &'cb str,
@@ -44,7 +41,7 @@ pub fn has_connected(c: ConnectionBetween) -> bool {
     let storage = format!(
         "{}/{}",
         Base::init_path()
-            .get_recursive(STORAGE_ARCHIVE_FOLDER)
+            .get_recursive(TELEPORT_ARCHIVE_FOLDER)
             .get_base_directory(),
         c.storage_index
     );

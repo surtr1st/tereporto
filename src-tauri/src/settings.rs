@@ -1,8 +1,8 @@
 use std::path::Path;
 use crate::{
     base::{Base, DirectoryControl},
-    helpers::{SETTINGS_FILE, remove_quotes},
-    toml_handler::TOMLHandler,
+    helpers::remove_quotes,
+    toml_handler::TOMLHandler, constants::SETTINGS_FILE,
 };
 
 use tauri::{WindowEvent, RunEvent, GlobalWindowEvent, AppHandle};

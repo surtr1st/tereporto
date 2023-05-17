@@ -11,6 +11,7 @@ mod storage_cmd;
 mod teleport;
 mod teleport_cmd;
 mod toml_handler;
+mod constants;
 
 use base::{Base, DirectoryControl};
 use crossbeam_channel::unbounded;
@@ -79,13 +80,9 @@ fn main() {
                     });
                     threads.push(thread_watcher);
                 }
-
-                for th in threads {
-                    th.join().unwrap();
-                }
             }
             // Delay or sleep for a certain period before the next iteration
-            std::thread::sleep(std::time::Duration::from_secs(1));
+            std::thread::sleep(std::time::Duration::from_secs(2));
         }
     });
 

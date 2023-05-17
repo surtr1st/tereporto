@@ -1,6 +1,7 @@
 use crate::base::{Base, DirectoryControl};
+use crate::constants::{STORAGE_ARCHIVE_FOLDER, TELEPORT_ARCHIVE_FOLDER, STORAGE_KEY, TELEPORT_KEY};
 use crate::hash_handler::HashHandler;
-use crate::helpers::{remove_quotes, STORAGE_ARCHIVE_FOLDER, TELEPORT_ARCHIVE_FOLDER};
+use crate::helpers::remove_quotes;
 use crate::storage::{NewStorage, Storage, StorageArgs};
 use crate::toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs};
 use std::fs;
@@ -24,7 +25,7 @@ pub fn get_storages() -> Vec<Storage> {
         let filename = file.path().display().to_string();
         let content = handler.retrieve(&filename).read_content();
 
-        let section = content.get("storage");
+        let section = content.get(STORAGE_KEY);
         if let Some(storage) = section {
             if let Some(s) = storage.as_table() {
                 storages.push(Storage {
@@ -82,7 +83,7 @@ pub fn update_storage(filename: String, target: MappedField) -> Result<String, S
     handler.update(
         &mut content,
         TOMLUpdateArgs {
-            key: "storage",
+            key: STORAGE_KEY,
             to: MappedField {
                 field: target.field,
                 value: target.value,
@@ -106,7 +107,7 @@ pub fn remove_storage(filename: String) -> Result<String, String> {
         let file_in_teleport = entry.path().display().to_string();
         let mut content = handler.retrieve(&file_in_teleport).read_content();
 
-        let section = content.get("teleports");
+        let section = content.get(TELEPORT_KEY);
         if let Some(teleport) = section {
             if let Some(t) = teleport.as_table() {
                 let constraint_field = t.get("to");
