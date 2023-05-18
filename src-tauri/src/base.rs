@@ -18,7 +18,7 @@ pub trait DirectoryControl {
 
 impl DirectoryControl for Base {
     fn init_path() -> Self {
-        let default_path = format!("{}/{}", Self::get_root_directory(), MAIN_ARCHIVE);
+        let default_path = format!("{}/{}", "C:/Users/ishis", MAIN_ARCHIVE);
 
         if !Path::new(&default_path).is_dir() {
             fs::create_dir(&default_path).unwrap();
@@ -47,6 +47,10 @@ impl DirectoryControl for Base {
     }
 
     fn get_root_directory() -> String {
+        let current_os = env::consts::OS;
+        if current_os == "windows" {
+            return env::var("USERPROFILE").unwrap();
+        }
         env::var("HOME").unwrap()
     }
 
