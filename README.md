@@ -33,6 +33,7 @@
 - ~~**Windows** (Apparently app cannot be opened)~~
 
   - ~~[MSI](https://github.com/surtr1st/tereporto/releases/download/v0.4.2-beta/tereporto_0.4.2_x64_en-US.msi)~~
+  - ~~[NSIS](https://github.com/surtr1st/tereporto/releases/download/v0.4.2-beta/tereporto_0.4.2_x64-setup.exe)~~
 
 - **Linux**
 
