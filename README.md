@@ -9,8 +9,7 @@
 - **Tereporto** (テレポート) is a desktop-based application with the purpose of creating a shortcut when working with files and folders, taking over the ability to _transfer files and folders_. Tereporto is written in Tauri, with a user interface that makes it easier to work with and a back-end service written in Rust that enhances the transfer and also ensures safety when executing. <br />
 
 [Getting started](#getting-started) |
-[Installation](#installation) |
-[Experimental](#experimental)
+[Installation](#installation)
 
 </div>
 
@@ -39,13 +38,3 @@
 
   - [Debian-based](https://github.com/surtr1st/tereporto/releases/download/v0.4.2-beta/tereporto_0.4.2_amd64.deb)
   - [AppImage](https://github.com/surtr1st/tereporto/releases/download/v0.4.2-beta/tereporto_0.4.2_amd64.AppImage)
-
-## Experimental
-
-- The current state of the application is **beta**, the application only has one feature due to the complexity of other features.
-
-### Testing features
-
-- **_Multiple teleports_** - When you have already registered a new teleport, you can duplicate the folder name of the registered teleport and then use it to teleport to the storage folder, which means you could have more than one teleport folder with the exact same name but different in directory. Those teleports with the same name can point to their storage folder and then transfer to it, and obviously you still cannot have more than one storage folder of the registered teleports.
-
-- **_Folder navigation_** - This feature is simple in logic and also has the concept of teleport, `folder navigation` functionality that would open the desired directory immediately after subscribing the desired directory into a folder, which sounds exactly like creating a shortcut in Windows.
