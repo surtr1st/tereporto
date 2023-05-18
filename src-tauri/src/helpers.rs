@@ -57,7 +57,7 @@ pub fn retrieve_directory_content(dir: &str) -> Vec<PathBuf> {
 
 pub fn retrieve_directory_files(dir: &str) -> Vec<DirEntry> {
     fs::read_dir(dir)
-        .unwrap()
+        .expect("should read the directory specified!")
         .filter_map(Result::ok)
         .filter(|entry| entry.file_type().map(|ft| ft.is_file()).unwrap_or(false))
         .collect::<Vec<_>>()
