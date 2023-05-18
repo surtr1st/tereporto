@@ -25,6 +25,7 @@ pub struct Constraint {
 
 #[tauri::command]
 pub fn open_selected_directory(dir: &str) -> Result<(), String> {
+    println!("{}", dir);
     match open::that(dir) {
         Ok(status) => Ok(()),
         Err(_) => Err(String::from("Cannot open selected directory!")),
@@ -32,8 +33,10 @@ pub fn open_selected_directory(dir: &str) -> Result<(), String> {
 }
 
 pub fn remove_quotes(target: &str) -> String {
-    let regex = Regex::new("\"").unwrap();
-    format!("{}", regex.replace_all(target, ""))
+    let single_quote = Regex::new("\'").unwrap();
+    let quotes = Regex::new("\"").unwrap();
+    let remove_single = format!("{}", single_quote.replace_all(target, ""));
+    format!("{}", quotes.replace_all(&remove_single, ""))
 }
 
 pub fn retrieve_directories(dir: &str) -> Vec<PathBuf> {
@@ -58,4 +61,13 @@ pub fn retrieve_directory_files(dir: &str) -> Vec<DirEntry> {
         .filter_map(Result::ok)
         .filter(|entry| entry.file_type().map(|ft| ft.is_file()).unwrap_or(false))
         .collect::<Vec<_>>()
+}
+
+pub fn convert_to_linux_path(path: &str) -> String {
+    let path_str = path.to_string();
+    path_str.replace("\\", "/")
+}
+
+pub fn is_windows_path(path: &str) -> bool {
+    path.contains("\\")
 }

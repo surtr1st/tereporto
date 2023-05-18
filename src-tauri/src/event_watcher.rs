@@ -1,12 +1,12 @@
-use crate::helpers::retrieve_directory_content;
+use crate::helpers::{is_windows_path, retrieve_directory_content};
 use crate::storage::Storage;
 use crate::teleport::{Teleport, TeleportTarget};
 use crossbeam_channel::Receiver;
+use fs_extra::file::{self, CopyOptions};
 use notify::event::CreateKind;
 use notify::*;
 use rayon::prelude::*;
 use std::collections::HashMap;
-use std::fs;
 use std::sync::{Arc, Mutex};
 
 pub fn watch(
@@ -17,13 +17,16 @@ pub fn watch(
     loop {
         match rx.lock().unwrap().recv() {
             Ok(Ok(evt)) => {
-                let file = CreateKind::File;
-                let folder = CreateKind::Folder;
-                if evt.kind == EventKind::Create(file) || evt.kind == EventKind::Create(folder) {
+                let any = CreateKind::Any;
+                if evt.kind == EventKind::Create(any) {
                     let paths = evt.paths.first().unwrap();
                     let display = paths.display().to_string();
                     let hash_map = map.lock().unwrap();
-                    let mut parts = display.split('/').collect::<Vec<_>>();
+                    let mut slash = '/';
+                    if is_windows_path(&display) {
+                        slash = '\\';
+                    }
+                    let mut parts = display.split(slash).collect::<Vec<_>>();
                     parts.pop().unwrap();
                     let target_dir = parts.join("/");
 
@@ -36,7 +39,8 @@ pub fn watch(
                                 panic!("should return file: {}", file.to_str().unwrap())
                             });
                             let destination = format!("{}/{}", dest, filename.to_str().unwrap());
-                            fs::rename(file, &destination).unwrap_or_else(|_| {
+                            let options = CopyOptions::new();
+                            file::move_file(file, &destination, &options).unwrap_or_else(|_| {
                                 panic!("should transfer file to {}", &destination)
                             });
                         });

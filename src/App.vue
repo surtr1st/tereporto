@@ -62,7 +62,11 @@ function retrieveStorages() {
 
 function createNewTeleport() {
   // Get the last element which is the folder name
-  const name = `${teleport.value}`.split('/').at(-1) as string;
+  let name = '';
+  const dir = `${teleport.value}`;
+  if (dir.includes('\\')) name = dir.split('\\').at(-1) as string;
+  else name = dir.split('/').at(-1) as string;
+
   const teleports: Teleport[] = [];
 
   if (Array.isArray(teleport.value)) {
@@ -78,7 +82,11 @@ function createNewTeleport() {
 }
 
 function createNewStorage() {
-  const name = `${storage.value}`.split('/').at(-1) as string;
+  let name = '';
+  const dir = `${storage.value}`;
+  if (dir.includes('\\')) name = dir.split('\\').at(-1) as string;
+  else name = dir.split('/').at(-1) as string;
+
   const storages: Storage[] = [];
 
   if (Array.isArray(storage.value)) {
