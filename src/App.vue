@@ -183,11 +183,7 @@ onMounted(() => {
                 :title="removeQuotes(teleport.name)"
                 :description="teleport.directories"
                 @action="
-                  teleport.directories.length === 1
-                    ? handleSelectedDirs(teleport.index)
-                    : openSelectedDir(
-                        removeQuotes(teleport.directories.join('')),
-                      )
+                  openSelectedDir(removeQuotes(teleport.directories.join('')))
                 "
               />
               <Button
