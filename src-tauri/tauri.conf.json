@@ -18,8 +18,7 @@
         "open": true
       },
       "dialog": {
-        "open": true,
-        "save": true
+        "open": true
       }
     },
     "systemTray": {
@@ -35,7 +34,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.tauri.dev.tereporto-beta",
       "targets": "all"
     },
     "security": {
