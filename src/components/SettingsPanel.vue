@@ -51,7 +51,7 @@ function loadSettings() {
     .catch((e) => console.log(e));
 }
 
-function setOptions() {
+function saveOptions() {
   const option = new Map<string, string>();
   Object.entries(settings.value).forEach(([key, value]) => {
     if (typeof value === 'string') option.set(key, `${removeQuotes(value)}`);
@@ -98,6 +98,7 @@ onMounted(() => loadSettings());
               id="auto-scan-checkbox"
               :label="$t('message.panel.settings.auto.scan')"
               :value="!settings.auto_scan ? true : false"
+              :disabled="true"
               v-model:checked="settings.auto_scan"
             />
           </PlaceHolder>
@@ -153,7 +154,7 @@ onMounted(() => loadSettings());
           color="neutral"
           larger
           rounded
-          @click="setOptions()"
+          @click="saveOptions()"
         />
       </Flex>
     </ModalFooter>

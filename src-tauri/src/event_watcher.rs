@@ -1,3 +1,6 @@
+use crate::helpers::retrieve_directory_content;
+use crate::storage::Storage;
+use crate::teleport::{Teleport, TeleportTarget};
 use crossbeam_channel::Receiver;
 use notify::event::CreateKind;
 use notify::*;
@@ -5,8 +8,6 @@ use rayon::prelude::*;
 use std::collections::HashMap;
 use std::fs;
 use std::sync::{Arc, Mutex};
-
-use crate::helpers::retrieve_directory_content;
 
 pub fn watch(
     rx: Arc<Mutex<Receiver<std::result::Result<Event, Error>>>>,
@@ -52,4 +53,27 @@ pub fn watch(
             }
         }
     }
+}
+
+pub fn receive_connection() -> Vec<TeleportTarget> {
+    let mut connection = vec![];
+
+    let connected_teleports = Teleport::get_connected();
+    let storages = Storage::get_map();
+
+    if connected_teleports.is_empty() {
+        return connection;
+    }
+
+    // Check if connected
+    for t in &connected_teleports {
+        if storages.contains_key(&t.current_connect) {
+            connection.push(TeleportTarget {
+                target: t.directory.clone(),
+                destination: storages.get(&t.current_connect).unwrap().clone(),
+            })
+        }
+    }
+
+    connection
 }

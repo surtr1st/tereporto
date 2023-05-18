@@ -1,6 +1,12 @@
 use std::collections::HashMap;
 
-use crate::{hash_handler::HashHandler, base::{Base, DirectoryControl}, constants::{STORAGE_ARCHIVE_FOLDER, STORAGE_KEY}, helpers::retrieve_directory_files, toml_handler::TOMLHandler};
+use crate::{
+    base::{Base, DirectoryControl},
+    constants::{STORAGE_ARCHIVE_FOLDER, STORAGE_KEY},
+    hash_handler::HashHandler,
+    helpers::retrieve_directory_files,
+    toml_handler::TOMLHandler,
+};
 use clap::Args;
 
 #[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
@@ -55,17 +61,18 @@ impl Storage {
             .get_base_directory();
 
         let files: Vec<_> = retrieve_directory_files(&dir);
-        files
-            .iter()
-            .for_each(|file| {
-                let filename = file.path().display().to_string();
-                let content = handler.retrieve(&filename).read_content();
-                let field = handler.get_content(&content, STORAGE_KEY);
-                if let Ok(f) = field {
-                    map.insert(f.get("index").unwrap().to_string(), f.get("directory").unwrap().to_string());
-                }
-            });
-        
+        files.iter().for_each(|file| {
+            let filename = file.path().display().to_string();
+            let content = handler.retrieve(&filename).read_content();
+            let field = handler.get_content(&content, STORAGE_KEY);
+            if let Ok(f) = field {
+                map.insert(
+                    f.get("index").unwrap().to_string(),
+                    f.get("directory").unwrap().to_string(),
+                );
+            }
+        });
+
         map
     }
 }

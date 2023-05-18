@@ -19,7 +19,7 @@
     "settings": {
       "title": "Cài đặt",
       "auto": {
-        "title": "Tự dộng quét vị trí của mốc dịch chuyển",
+        "title": "Tự dộng quét vị trí của mốc dịch chuyển (Đang thử nghiệm)",
         "scan": "Tự dộng"
       },
       "lang": {

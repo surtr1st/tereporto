@@ -8,6 +8,7 @@ interface ICheckbox {
   value?: boolean;
   checked?: boolean;
   style?: StyleValue;
+  disabled?: boolean;
 }
 defineProps<ICheckbox>();
 defineEmits(['update:checked']);
@@ -16,7 +17,11 @@ defineEmits(['update:checked']);
 <template>
   <label
     :for="id"
-    class="tp__checkbox-label"
+    :class="
+      disabled
+        ? 'tp__checkbox-label tp__checkbox-label--disabled'
+        : 'tp__checkbox-label'
+    "
     :style="style"
   >
     {{ label }}
@@ -26,6 +31,7 @@ defineEmits(['update:checked']);
       :checked="checked"
       :name="name"
       :value="value"
+      :disabled="disabled"
       @click="$emit('update:checked', value)"
     />
     <span class="tp__checkmark"></span>
@@ -49,6 +55,10 @@ defineEmits(['update:checked']);
   background: inherit;
 }
 
+.tp__checkbox-label--disabled {
+  color: var(--light-neutral-gray);
+}
+
 /* Hide the browser's default checkbox */
 .tp__checkbox-label input {
   position: absolute;
@@ -57,7 +67,6 @@ defineEmits(['update:checked']);
   height: 0;
   width: 0;
 }
-
 /* Create a custom checkbox */
 .tp__checkmark {
   position: absolute;
