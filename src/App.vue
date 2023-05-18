@@ -255,6 +255,7 @@ onMounted(() => {
             name="scan-btn"
             :label="$t('message.feature.scan_teleport')"
             color="darker"
+            disabled
             rounded
             larger
           />

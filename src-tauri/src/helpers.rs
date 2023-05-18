@@ -1,5 +1,8 @@
 #![allow(dead_code, unused)]
-use std::{fs::{self, DirEntry}, path::PathBuf};
+use std::{
+    fs::{self, DirEntry},
+    path::PathBuf,
+};
 
 use crate::{
     base::{Base, DirectoryControl},
@@ -31,6 +34,14 @@ pub fn open_selected_directory(dir: &str) -> Result<(), String> {
 pub fn remove_quotes(target: &str) -> String {
     let regex = Regex::new("\"").unwrap();
     format!("{}", regex.replace_all(target, ""))
+}
+
+pub fn retrieve_directories(dir: &str) -> Vec<PathBuf> {
+    fs::read_dir(dir)
+        .expect("should read the directory specified!")
+        .map(|entry| entry.unwrap().path())
+        .filter(|path| path.is_dir())
+        .collect::<Vec<_>>()
 }
 
 pub fn retrieve_directory_content(dir: &str) -> Vec<PathBuf> {

@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod base;
 mod constants;
+mod event;
 mod event_watcher;
 mod hash_handler;
 mod helpers;
@@ -15,19 +16,13 @@ mod toml_handler;
 
 use base::{Base, DirectoryControl};
 use crossbeam_channel::unbounded;
-use event_watcher::watch;
-use helpers::{open_selected_directory, remove_quotes};
-use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
+use event::on_teleport_event;
+use helpers::open_selected_directory;
 use settings::{SystemSettings, SystemSettingsTrait};
 use settings_cmd::{load_settings, save_settings};
-use storage::Storage;
-use std::collections::HashMap;
-use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
-use std::time::Duration;
 use storage_cmd::{create_storage, get_storages, remove_storage, update_storage};
-use teleport::{Teleport, TeleportTarget};
 use teleport_cmd::{create_teleport, get_teleports, remove_teleport, update_teleport};
 
 use tauri::{
@@ -41,51 +36,7 @@ fn main() {
     let (tx, rx) = unbounded();
     let rx_arc = Arc::new(Mutex::new(rx));
 
-    tauri::async_runtime::spawn(async move {
-        let map = Arc::new(Mutex::new(HashMap::<String, String>::default()));
-        loop {
-            let connection = receive_connection();
-            if !connection.is_empty() {
-                let mut threads = vec![];
-                // Handle each watcher
-                for c in connection {
-                    let tx_clone = tx.clone();
-                    let rx_clone = Arc::clone(&rx_arc);
-                    let target = remove_quotes(&c.target);
-                    let destination = remove_quotes(&c.destination);
-
-                    let map_clone = Arc::clone(&map);
-                    map_clone
-                        .lock()
-                        .unwrap()
-                        .insert(target.clone(), destination.clone());
-
-                    let thread_watcher = std::thread::spawn(move || {
-                        let tx = tx_clone;
-                        let rx = rx_clone;
-                        let target = target;
-                        let map_inner_clone = Arc::clone(&map_clone);
-
-                        let config = Config::default()
-                            .with_poll_interval(Duration::from_secs(2))
-                            .with_compare_contents(true);
-                        // Create a file system watcher
-                        let mut watcher: RecommendedWatcher = Watcher::new(tx, config).unwrap();
-
-                        watcher
-                            .watch(&PathBuf::from(&target), RecursiveMode::Recursive)
-                            .unwrap();
-
-                        std::thread::sleep(std::time::Duration::from_secs(1));
-                        watch(rx, map_inner_clone);
-                    });
-                    threads.push(thread_watcher);
-                }
-            }
-            // Delay or sleep for a certain period before the next iteration
-            std::thread::sleep(std::time::Duration::from_secs(2));
-        }
-    });
+    on_teleport_event(tx, rx_arc);
 
     tauri::Builder::default()
         .system_tray(create_system_tray())
@@ -133,27 +84,4 @@ fn handle_system_tray(app: &AppHandle, event: SystemTrayEvent) {
             _ => {}
         }
     }
-}
-
-fn receive_connection() -> Vec<TeleportTarget> {
-    let mut connection = vec![];
-
-    let connected_teleports = Teleport::get_connected();
-    let storages = Storage::get_map();
-
-    if connected_teleports.is_empty() {
-        return connection;
-    }
-
-    // Check if connected
-    for t in &connected_teleports {
-        if storages.contains_key(&t.current_connect) {
-            connection.push(TeleportTarget {
-                target: t.directory.clone(),
-                destination: storages.get(&t.current_connect).unwrap().clone()
-            })
-        }
-    }
-
-    connection
 }
