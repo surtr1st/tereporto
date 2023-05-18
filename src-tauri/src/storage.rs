@@ -1,4 +1,12 @@
-use crate::hash_handler::HashHandler;
+use std::collections::HashMap;
+
+use crate::{
+    base::{Base, DirectoryControl},
+    constants::{STORAGE_ARCHIVE_FOLDER, STORAGE_KEY},
+    hash_handler::HashHandler,
+    helpers::retrieve_directory_files,
+    toml_handler::TOMLHandler,
+};
 use clap::Args;
 
 #[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
@@ -43,5 +51,28 @@ impl Storage {
             },
         };
         toml::to_string_pretty(&storage).unwrap()
+    }
+
+    pub fn get_map() -> HashMap<String, String> {
+        let mut map = HashMap::new();
+        let mut handler = TOMLHandler::default();
+        let dir = Base::init_path()
+            .get_recursive(STORAGE_ARCHIVE_FOLDER)
+            .get_base_directory();
+
+        let files: Vec<_> = retrieve_directory_files(&dir);
+        files.iter().for_each(|file| {
+            let filename = file.path().display().to_string();
+            let content = handler.retrieve(&filename).read_content();
+            let field = handler.get_content(&content, STORAGE_KEY);
+            if let Ok(f) = field {
+                map.insert(
+                    f.get("index").unwrap().to_string(),
+                    f.get("directory").unwrap().to_string(),
+                );
+            }
+        });
+
+        map
     }
 }

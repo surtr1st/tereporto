@@ -1,6 +1,6 @@
 use std::{env, fs, path::Path};
 
-const STORE: &str = ".tereporto";
+use crate::constants::MAIN_ARCHIVE;
 
 #[derive(Debug, Clone)]
 pub struct Base {
@@ -18,7 +18,7 @@ pub trait DirectoryControl {
 
 impl DirectoryControl for Base {
     fn init_path() -> Self {
-        let default_path = format!("{}/{}", Self::get_root_directory(), STORE);
+        let default_path = format!("{}/{}", Self::get_root_directory(), MAIN_ARCHIVE);
 
         if !Path::new(&default_path).is_dir() {
             fs::create_dir(&default_path).unwrap();

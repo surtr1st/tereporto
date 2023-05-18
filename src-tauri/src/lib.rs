@@ -1,4 +1,6 @@
 pub mod base;
+pub mod constants;
+pub mod event;
 pub mod event_watcher;
 pub mod hash_handler;
 pub mod helpers;

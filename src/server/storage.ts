@@ -2,39 +2,16 @@ import { invoke } from '@tauri-apps/api';
 import { Storage, StorageResponse, StorageUpdateArgs } from '../types';
 
 export function useStorage() {
-  const getStorages = async () => {
-    try {
-      return await invoke<StorageResponse[]>('get_storages');
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  const createStorage = async (storages: Storage[]) => {
-    try {
-      const result = await invoke<string>('create_storage', { storages });
-      console.log(result);
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  const getStorages = async () =>
+    await invoke<StorageResponse[]>('get_storages');
+  const createStorage = async (storages: Storage[]) =>
+    await invoke<string>('create_storage', { storages });
 
-  const updateStorage = async (args: StorageUpdateArgs) => {
-    try {
-      const result = await invoke<string>('update_storage', { ...args });
-      console.log(result);
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  const updateStorage = async (args: StorageUpdateArgs) =>
+    await invoke<string>('update_storage', { ...args });
 
-  const removeStorage = async (filename: string) => {
-    try {
-      const result = await invoke<string>('remove_storage', { filename });
-      console.log(result);
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  const removeStorage = async (filename: string) =>
+    await invoke<string>('remove_storage', { filename });
 
   return {
     getStorages,

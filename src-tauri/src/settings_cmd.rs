@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     base::{Base, DirectoryControl},
-    helpers::SETTINGS_FILE,
+    constants::SETTINGS_FILE,
     settings::Settings,
     toml_handler::{MappedField, TOMLHandler, TOMLUpdateArgs},
 };
