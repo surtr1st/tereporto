@@ -28,16 +28,16 @@
 
 ## Installation
 
-- If you want to try this application out, you can consider these installations below:
+- If you want to try this application out, you can consider the installations below:
 
 - **Windows**
 
-  - ![MSI]()
+  - [MSI](https://github.com/surtr1st/tereporto/releases/download/v0.4.2-beta/tereporto_0.4.2_x64_en-US.msi)
 
 - **Linux**
 
-  - ![Debian-based]()
-  - ![AppImage]()
+  - [Debian-based](https://github.com/surtr1st/tereporto/releases/download/v0.4.2-beta/tereporto_0.4.2_amd64.deb)
+  - [AppImage](https://github.com/surtr1st/tereporto/releases/download/v0.4.2-beta/tereporto_0.4.2_amd64.AppImage)
 
 ## Experimental
 
