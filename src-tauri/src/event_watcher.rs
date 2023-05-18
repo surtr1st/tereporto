@@ -49,7 +49,7 @@ pub fn watch(
                             }
                             if file.is_dir() {
                                 let options = dir::CopyOptions::new();
-                                dir::move_dir(&final_name, &dest, &options).unwrap_or_else(|_| {
+                                dir::move_dir(&final_name, dest, &options).unwrap_or_else(|_| {
                                     panic!("should transfer folders to {}", &dest)
                                 });
                             }

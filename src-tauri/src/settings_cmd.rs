@@ -25,10 +25,7 @@ pub fn save_settings(options: HashMap<String, String>) {
                 &mut content,
                 TOMLUpdateArgs {
                     key: SETTINGS_FILE,
-                    to: MappedField {
-                        field: &key,
-                        value: &value,
-                    },
+                    to: MappedField { field: key, value },
                 },
             )
             .unwrap();

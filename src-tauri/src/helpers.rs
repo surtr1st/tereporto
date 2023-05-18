@@ -65,9 +65,9 @@ pub fn retrieve_directory_files(dir: &str) -> Vec<DirEntry> {
 
 pub fn convert_to_linux_path(path: &str) -> String {
     let path_str = path.to_string();
-    path_str.replace("\\", "/")
+    path_str.replace('\\', "/")
 }
 
 pub fn is_windows_path(path: &str) -> bool {
-    path.contains("\\")
+    path.contains('\\')
 }
