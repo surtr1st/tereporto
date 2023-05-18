@@ -58,14 +58,12 @@ pub fn on_teleport_event(
                         watcher
                             .watch(&PathBuf::from(&target), RecursiveMode::Recursive)
                             .unwrap();
-
-                        std::thread::sleep(Duration::from_secs(1));
                         watch(rx_clone, map_inner_clone);
                     });
                 }
             }
             // Delay or sleep for a certain period before the next iteration
-            std::thread::sleep(Duration::from_secs(2));
+            std::thread::sleep(Duration::from_secs(1));
         }
     });
 }

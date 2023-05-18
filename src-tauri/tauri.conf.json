@@ -32,7 +32,7 @@
         "icons/128x128.png",
         "icons/128x128@2x.png",
         "icons/icon.icns",
-        "icons/icon.ico"
+        "icons/appicon.ico"
       ],
       "identifier": "com.tauri.dev.tereporto-beta",
       "targets": "all",
@@ -57,6 +57,7 @@
     },
     "windows": [
       {
+        "center": true,
         "fullscreen": false,
         "resizable": false,
         "title": "Tereporto",
