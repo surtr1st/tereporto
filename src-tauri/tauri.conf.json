@@ -35,7 +35,19 @@
         "icons/icon.ico"
       ],
       "identifier": "com.tauri.dev.tereporto-beta",
-      "targets": "all"
+      "targets": "all",
+      "macOS": {
+        "entitlements": null,
+        "exceptionDomain": "",
+        "frameworks": [],
+        "providerShortName": null,
+        "signingIdentity": null
+      },
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": ""
+      }
     },
     "security": {
       "csp": null
