@@ -1,15 +1,23 @@
-### Table of Contents
-1. [Introduction](#introduction)
-2. [Getting started](#getting-started)
-3. [Installation](#installation)
+<div align="center">
 
-## Introduction
+# Tereporto
 
-- __Tereporto__ (テレポート) is a desktop-based application with the purpose of increasing the ability of _transferring files and folders_. Tereporto is written in Tauri, with a user interface that makes it easier to work with and a back-end service written in Rust that enhances the transfer and also ensures safety when executing.
+![](https://img.shields.io/badge/Tauri-FFC131?style=for-the-badge&logo=Tauri&logoColor=white) •
+![](https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D) •
+![](https://img.shields.io/badge/Rust-black?style=for-the-badge&logo=rust&logoColor=#E57324)
 
-![Main-Layout](main-ui.png)
+- __Tereporto__ (テレポート) is a desktop-based application with the purpose of creating a shortcut when came to work with files and folders, take over the ability of _transferring files and folders_. Tereporto is written in Tauri, with a user interface that makes it easier to work with and a back-end service written in Rust that enhances the transfer and also ensures safety when executing. <br />
+
+[Getting started](#getting-started) |
+[Installation](#installation)
+
+</div>
+
+
 
 ## Getting started
+
+![Main-Layout](main-ui.png)
 
 - The rule is pretty logic and simple, you first adding between `teleport` and `storage` directories, this way you will mark the directory you chosen with the `teleport marker` in the selected directory and same goes with storage.
 
