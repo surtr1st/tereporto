@@ -30,10 +30,10 @@
 
 - If you want to try this application out, you can consider the installations below:
 
-- ~~**Windows** (Apparently app cannot be opened)~~
+- **Windows**
 
-  - ~~[MSI](https://github.com/surtr1st/tereporto/releases/download/v0.4.2-beta/tereporto_0.4.2_x64_en-US.msi)~~
-  - ~~[NSIS](https://github.com/surtr1st/tereporto/releases/download/v0.4.2-beta/tereporto_0.4.2_x64-setup.exe)~~
+  - [MSI](https://github.com/surtr1st/tereporto/releases/download/v0.4.3-beta/tereporto_0.4.3_x64-setup.exe)
+  - [NSIS](https://github.com/surtr1st/tereporto/releases/download/v0.4.3-beta/tereporto_0.4.3_x64_en-US.msi)
 
 - **Linux**
 
