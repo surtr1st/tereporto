@@ -1,16 +1,13 @@
 #![allow(dead_code, unused)]
-use std::{fs, path::PathBuf};
+use std::{fs::{self, DirEntry}, path::PathBuf};
 
 use crate::{
     base::{Base, DirectoryControl},
+    constants::TELEPORT_ARCHIVE_FOLDER,
     hash_handler::HashHandler,
     toml_handler::TOMLHandler,
 };
 use regex::Regex;
-
-pub const TELEPORT_ARCHIVE_FOLDER: &str = "teleports";
-pub const STORAGE_ARCHIVE_FOLDER: &str = "storages";
-pub const SETTINGS_FILE: &str = "settings";
 
 pub struct ConnectionBetween<'cb> {
     pub teleport_index: &'cb str,
@@ -31,43 +28,6 @@ pub fn open_selected_directory(dir: &str) -> Result<(), String> {
     }
 }
 
-pub fn has_connected(c: ConnectionBetween) -> bool {
-    let mut handler = TOMLHandler::default();
-
-    let teleport = format!(
-        "{}/{}",
-        Base::init_path()
-            .get_recursive(TELEPORT_ARCHIVE_FOLDER)
-            .get_base_directory(),
-        c.teleport_index
-    );
-    let storage = format!(
-        "{}/{}",
-        Base::init_path()
-            .get_recursive(STORAGE_ARCHIVE_FOLDER)
-            .get_base_directory(),
-        c.storage_index
-    );
-
-    let t = handler.retrieve(&teleport).read_content();
-    let s = handler.retrieve(&storage).read_content();
-
-    let mut indexes = vec![];
-    if let Some(section) = t.get("teleports") {
-        if let Some(teleport) = section.as_table() {
-            indexes.push(teleport.get("to").unwrap().to_string());
-        }
-    }
-
-    if let Some(section) = s.get("storage") {
-        if let Some(storage) = section.as_table() {
-            indexes.push(storage.get("constraint").unwrap().to_string());
-        }
-    }
-
-    indexes[0] == indexes[1]
-}
-
 pub fn remove_quotes(target: &str) -> String {
     let regex = Regex::new("\"").unwrap();
     format!("{}", regex.replace_all(target, ""))
@@ -78,5 +38,13 @@ pub fn retrieve_directory_content(dir: &str) -> Vec<PathBuf> {
         .expect("should read the directory specified!")
         .map(|entry| entry.unwrap().path())
         .filter(|path| path.is_file() || path.is_dir())
+        .collect::<Vec<_>>()
+}
+
+pub fn retrieve_directory_files(dir: &str) -> Vec<DirEntry> {
+    fs::read_dir(dir)
+        .unwrap()
+        .filter_map(Result::ok)
+        .filter(|entry| entry.file_type().map(|ft| ft.is_file()).unwrap_or(false))
         .collect::<Vec<_>>()
 }

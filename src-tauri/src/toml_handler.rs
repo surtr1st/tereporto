@@ -138,4 +138,17 @@ impl TOMLHandler {
             Err(_) => panic!("Cannot remove: {}", filename),
         }
     }
+
+    pub fn get_content<'c>(
+        &self,
+        content: &'c toml::Value,
+        key: &'c str,
+    ) -> Result<&'c toml::map::Map<String, toml::Value>, String> {
+        if let Some(section) = content.get(key) {
+            if let Some(field) = section.as_table() {
+                return Ok(field);
+            }
+        }
+        Err(String::from("No content"))
+    }
 }

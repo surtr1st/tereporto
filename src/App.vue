@@ -27,7 +27,7 @@ import { onMounted, ref, watch } from 'vue';
 import { StorageResponse, Teleport, TeleportResponse, Storage } from './types';
 import { useStorage, useTeleport, useDirectoryControl } from './server';
 import { removeQuotes } from './helpers';
-import { refresh } from './globals';
+import { refresh, useToastification } from './globals';
 </script>
 
 <script setup lang="ts">
@@ -39,10 +39,11 @@ const storage = ref<string | string[]>('');
 const teleports = ref<TeleportResponse[] | undefined>([]);
 const unconnectedTeleports = ref<TeleportResponse[] | undefined>([]);
 const storages = ref<StorageResponse[] | undefined>([]);
-const teleportDirs = ref<{ index: string; dirs: string[] }[]>([]);
+// const teleportDirs = ref<{ index: string; dirs: string[] }[]>([]);
 const { getTeleports, createTeleport, removeTeleport } = useTeleport();
 const { getStorages, createStorage, removeStorage } = useStorage();
 const { openSelectedDir } = useDirectoryControl();
+const { onSuccess, onError } = useToastification();
 
 function retrieveTeleports() {
   getTeleports()
@@ -50,13 +51,13 @@ function retrieveTeleports() {
       teleports.value = res;
       unconnectedTeleports.value = res?.filter((teleport) => !teleport.to);
     })
-    .catch((e) => console.log(e));
+    .catch((e) => onError(`${e}`));
 }
 
 function retrieveStorages() {
   getStorages()
     .then((res) => (storages.value = res))
-    .catch((e) => console.log(e));
+    .catch((e) => onError(`${e}`));
 }
 
 function createNewTeleport() {
@@ -72,8 +73,8 @@ function createNewTeleport() {
   } else teleports.push({ name, directory: teleport.value });
 
   createTeleport(teleports)
-    .then((rs) => console.log(rs))
-    .catch((e) => console.log(e));
+    .then((rs) => onSuccess(rs))
+    .catch((e) => onError(`${e}`));
 }
 
 function createNewStorage() {
@@ -88,20 +89,26 @@ function createNewStorage() {
   } else storages.push({ name, directory: storage.value });
 
   createStorage(storages)
-    .then((rs) => console.log(rs))
-    .catch((e) => console.log(e));
+    .then((rs) => onSuccess(rs))
+    .catch((e) => onError(`${e}`));
 }
 
 function removeSelectedTeleport(index: string) {
   removeTeleport(removeQuotes(index))
-    .then(() => (refresh.fetch = !refresh.fetch))
-    .catch((e) => console.log(e));
+    .then((rs) => {
+      refresh.fetch = !refresh.fetch;
+      onSuccess(rs);
+    })
+    .catch((e) => onError(`${e}`));
 }
 
 function removeSelectedStorage(index: string) {
   removeStorage(removeQuotes(index))
-    .then(() => (refresh.fetch = !refresh.fetch))
-    .catch((e) => console.log(e));
+    .then((rs) => {
+      refresh.fetch = !refresh.fetch;
+      onSuccess(rs);
+    })
+    .catch((e) => onError(`${e}`));
 }
 
 function handleSelectedDirs(index: string) {
