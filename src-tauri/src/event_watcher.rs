@@ -18,7 +18,12 @@ pub fn watch(
         match rx.lock().unwrap().recv() {
             Ok(Ok(evt)) => {
                 let any = CreateKind::Any;
-                if evt.kind == EventKind::Create(any) {
+                let file = CreateKind::File;
+                let folder = CreateKind::Folder;
+                if evt.kind == EventKind::Create(any)
+                    || evt.kind == EventKind::Create(file)
+                    || evt.kind == EventKind::Create(folder)
+                {
                     let paths = evt.paths.first().unwrap();
                     let display = paths.display().to_string();
                     let hash_map = map.lock().unwrap();
