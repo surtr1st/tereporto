@@ -71,3 +71,11 @@ pub fn convert_to_linux_path(path: &str) -> String {
 pub fn is_windows_path(path: &str) -> bool {
     path.contains('\\')
 }
+
+pub fn convert_between_linux_and_windows(path: &PathBuf) -> String {
+    let path = path.to_str().unwrap();
+    if is_windows_path(path) {
+        return convert_to_linux_path(path);
+    }
+    path.to_string()
+}
