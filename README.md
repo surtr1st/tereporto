@@ -30,11 +30,9 @@
 - If you want to try this application out, you can consider the installations below:
 
 - **Windows**
-
-  - [MSI](https://github.com/surtr1st/tereporto/releases/download/v0.4.3-beta/tereporto_0.4.3_x64-setup.exe)
+  - [Microsoft Software Installer](https://github.com/surtr1st/tereporto/releases/download/v0.4.3-beta/tereporto_0.4.3_x64-setup.exe)
   - [NSIS](https://github.com/surtr1st/tereporto/releases/download/v0.4.3-beta/tereporto_0.4.3_x64_en-US.msi)
 
 - **Linux**
-
-  - [Debian-based](https://github.com/surtr1st/tereporto/releases/download/v0.4.2-beta/tereporto_0.4.2_amd64.deb)
-  - [AppImage](https://github.com/surtr1st/tereporto/releases/download/v0.4.2-beta/tereporto_0.4.2_amd64.AppImage)
+  - [Debian-based](https://github.com/surtr1st/tereporto/releases/download/v0.4.3-beta/tereporto_0.4.3_amd64.deb)
+  - [AppImage](https://github.com/surtr1st/tereporto/releases/download/v0.4.3-beta/tereporto_0.4.3_amd64.AppImage)
